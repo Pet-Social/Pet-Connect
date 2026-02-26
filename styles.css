@@ -1,0 +1,70 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Outfit", "Segoe UI", Arial, sans-serif;
+}
+
+:root {
+    --primary-color: #38bdf8;
+    --secondary-color: #0369a1;
+    --background-dark: #0f172a;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+}
+
+/* Light theme variables */
+[data-theme="light"] {
+    --primary-color: #0284c7;
+    --secondary-color: #0ea5e9;
+    --background-dark: #fefefe;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+}
+
+body {
+    background-color: var(--background-dark);
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+header {
+    text-align: center;
+    padding: 2em 1.5em;
+    background-color: var(--secondary-color);
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+header h1 {
+    color: #fefefe;
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 1.2em;
+    margin-bottom: 1.5em;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.5em;
+}
+
+footer {
+    text-align: center;
+    background-color: var(--card-background);
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+    margin-top: 4em;
+    transition: background-color 0.3s ease;
+}
