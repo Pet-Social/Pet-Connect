@@ -1,78 +1,158 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Pet Connect</title>
-        <meta
-            name="description"
-            content="An Open Pet Social App : That offer a space for users to share their special moments, learn more about their pets and a space for pet adoption. "
-        />
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap"
-            rel="stylesheet"
-        />
 
-        <link rel="stylesheet" href="./styles.css" />
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Connect</title>
+    <meta name="description"
+        content="An Open Pet Social App : That offer a space for users to share their special moments, learn more about their pets and a space for pet adoption. " />
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
-        <link
-            rel="icon"
-            type="image/svg+xml"
-            href="assets/images/default-pet.svg"
-        />
+    <link rel="stylesheet" href="./styles.css" />
 
-        <!-- Preconnect to external domains-->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    </head>
-    <body>
-        <header>
-            <h1 style="size: 2.5em">Pet Connect</h1>
-            <button
-                class="theme-toggle"
-                id="theme-toggle"
-                aria-label="Toggle theme"
-            >
-                <span id="theme-icon">🌙</span>
+    <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
+
+    <!-- Preconnect to external domains-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+
+<body>
+    <header>
+        <h1>Pet Connect</h1>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </header>
+
+    <main class="container">
+        <div class="text-center mb-4">
+            <button class="submit-btn" id="togglePostBtn" style="margin: 0 auto;">
+                <span>📸 Partager un moment de votre animal</span>
             </button>
-        </header>
-        <footer>
-            <p>© 2026 L2 INFO ISIMM.</p>
-        </footer>
+        </div>
+        <section id="postSection" class="card hidden">
+            <h2 class="mb-4">Créer une publication</h2>
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="postImage">Choisir une photo</label>
+                    <label class="custum-file-upload" for="postImage">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <g stroke-width="0" id="SVGRepo_bgCarrier"></g>
+                                <g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <path fill=""
+                                        d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z"
+                                        clip-rule="evenodd" fill-rule="evenodd"></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="text">
+                            <span>Selectioner votre image</span>
+                        </div>
+                        <input type="file" id="postImage" class="form-control" accept="image/*" required>
+                    </label>
+                    <p id="uploadStatus" class="status-msg"></p>
+                </div>
+                <div class="form-group">
+                    <label for="postCaption">Write a Caption</label>
+                    <textarea id="postCaption" class="form-control"
+                        placeholder="What is your pet doing today?"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn">Post Moment</button>
+                    <button type="button" id="cancelPostBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </section>
+    </main>
 
-        <script>
-            // 1. Theme Toggle Function
-            function setupThemeToggle() {
-                const themeToggle = document.getElementById("theme-toggle");
-                const themeIcon = document.getElementById("theme-icon");
-                const contributionsImg = document.querySelector(
-                    "#contributions-graph img",
+    <footer>
+        <p>© 2026 L2 INFO ISIMM.</p>
+    </footer>
+
+    <script>
+        // Fonction de basculement du thème
+        function setupThemeToggle() {
+            const themeToggle = document.getElementById("theme-toggle");
+            const themeIcon = document.getElementById("theme-icon");
+
+            // Vérifier la préférence de thème enregistrée ou par défaut sur sombre
+            const savedTheme = localStorage.getItem("theme") || "dark";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            updateThemeIcon(savedTheme);
+
+            themeToggle.addEventListener("click", () => {
+                const currentTheme =
+                    document.documentElement.getAttribute("data-theme");
+                const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+                document.documentElement.setAttribute(
+                    "data-theme",
+                    newTheme,
                 );
+                localStorage.setItem("theme", newTheme);
+                updateThemeIcon(newTheme);
+            });
 
-                // Check for saved theme preference or default to dark
-                const savedTheme = localStorage.getItem("theme") || "dark";
-                document.documentElement.setAttribute("data-theme", savedTheme);
-                updateThemeIcon(savedTheme);
-
-                themeToggle.addEventListener("click", () => {
-                    const currentTheme =
-                        document.documentElement.getAttribute("data-theme");
-                    const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-                    document.documentElement.setAttribute(
-                        "data-theme",
-                        newTheme,
-                    );
-                    localStorage.setItem("theme", newTheme);
-                    updateThemeIcon(newTheme);
-                });
-
-                function updateThemeIcon(theme) {
-                    themeIcon.textContent = theme === "dark" ? "🌙" : "☀️";
-                }
+            function updateThemeIcon(theme) {
+                themeIcon.textContent = theme === "dark" ? "🌙" : "☀️";
             }
-            setupThemeToggle();
-        </script>
-    </body>
+        }
+        setupThemeToggle();
+
+        // Gestion des formulaires
+        const postForm = document.getElementById('postForm');
+        const postSection = document.getElementById('postSection');
+        const toggleBtn = document.getElementById('togglePostBtn');
+        const cancelBtn = document.getElementById('cancelPostBtn');
+        
+        function toggleForm() {
+            const isHidden = postSection.classList.contains('hidden');
+            if (isHidden) {
+                postSection.classList.remove('hidden');
+                toggleBtn.classList.add('hidden'); // Masquer le bouton principal
+            } else {
+                postSection.classList.add('hidden');
+                toggleBtn.classList.remove('hidden'); // Afficher le bouton principal
+            }
+        }
+
+        toggleBtn.addEventListener('click', toggleForm);
+        cancelBtn.addEventListener('click', toggleForm);
+
+        // Validation et logique de soumission
+        const postImageInput = document.getElementById('postImage');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        postImageInput.addEventListener('change', function () {
+            const file = this.files[0];
+
+            if (file) {
+                // Valider le type de fichier
+                if (!file.type.startsWith('image/')) {
+                    uploadStatus.textContent = "❌ Veuillez sélectionner une image valide.";
+                    uploadStatus.className = "status-msg error";
+                    return;
+                }
+                uploadStatus.textContent = "✅ Image prête !";
+                uploadStatus.className = "status-msg success";
+            } else {
+                uploadStatus.textContent = "";
+            }
+        });
+
+        postForm.addEventListener('submit', (e) => {
+            if (!postImageInput.files[0]) {
+                e.preventDefault();
+                uploadStatus.textContent = "❌ Vous devez choisir une photo.";
+                uploadStatus.className = "status-msg error";
+            }
+        });
+    </script>
+</body>
+
 </html>
