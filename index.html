@@ -29,9 +29,11 @@
 
     <main class="container">
         <div class="text-center mb-4">
+            <br>
             <button class="submit-btn" id="togglePostBtn" style="margin: 0 auto;">
                 <span>📸 Partager un moment de votre animal</span>
             </button>
+            <br>
         </div>
         <section id="postSection" class="card hidden">
             <h2 class="mb-4">Créer une publication</h2>
@@ -109,7 +111,7 @@
         const postSection = document.getElementById('postSection');
         const toggleBtn = document.getElementById('togglePostBtn');
         const cancelBtn = document.getElementById('cancelPostBtn');
-        
+
         function toggleForm() {
             const isHidden = postSection.classList.contains('hidden');
             if (isHidden) {
