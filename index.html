@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pet Connect</title>
     <meta name="description"
-        content="An Open Pet Social App : That offer a space for users to share their special moments, learn more about their pets and a space for pet adoption. " />
-    <!-- Fonts -->
+        content="Une application sociale ouverte pour animaux de compagnie : offrant un espace aux utilisateurs pour partager leurs moments spéciaux, en apprendre plus sur leurs animaux et un espace pour l'adoption d'animaux. " />
     <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="./styles.css" />
@@ -24,12 +23,12 @@
         <div class="container navbar">
             <a href="index.html" class="logo">🐾 Pet Connect</a>
             <nav class="nav-links">
-                <a href="index.html" class="active">Home</a>
+                <a href="index.html" class="active">Accueil</a>
                 <a href="adoption.html">Adoption</a>
-                <a href="shop.html">Shop</a>
-                <a href="vets.html">Vets</a>
-                <a href="tips.html">Tips</a>
-                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                <a href="shop.html">Boutique</a>
+                <a href="vets.html">Vétérinaires</a>
+                <a href="tips.html">Conseils</a>
+                <button id="theme-toggle" class="theme-toggle-btn" title="Changer le thème">
                     <span id="theme-icon">🌙</span>
                 </button>
             </nav>
@@ -38,9 +37,9 @@
 
     <main class="container">
         <div class="text-center mb-4">
-            <br>
-            <button class="submit-btn" id="togglePostBtn" style="margin: 0 auto;">
-                <span>📸 Share a moment with your pet</span>
+            <br />
+            <button class="submit-btn" id="togglePostBtn" style="margin: 0 auto">
+                <span>📸 Partagez un moment avec votre animal</span>
             </button>
             <br>
         </div>
@@ -62,20 +61,24 @@
                             </svg>
                         </div>
                         <div class="text">
-                            <span>Selectioner votre image</span>
+                            <span>Sélectionnez votre image</span>
                         </div>
-                        <input type="file" id="postImage" class="form-control" accept="image/*" required>
+                        <input type="file" id="postImage" class="form-control" accept="image/*" required />
                     </label>
                     <p id="uploadStatus" class="status-msg"></p>
                 </div>
                 <div class="form-group">
-                    <label for="postCaption">Write a Caption</label>
+                    <label for="postCaption">Écrire une légende</label>
                     <textarea id="postCaption" class="form-control"
-                        placeholder="What is your pet doing today?"></textarea>
+                        placeholder="Que fait votre animal aujourd'hui ?"></textarea>
                 </div>
                 <div class="post-actions">
-                    <button type="submit" class="btn">Post Moment</button>
-                    <button type="button" id="cancelPostBtn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn">
+                        Publier le moment
+                    </button>
+                    <button type="button" id="cancelPostBtn" class="btn btn-secondary">
+                        Annuler
+                    </button>
                 </div>
             </form>
         </section>
@@ -116,36 +119,37 @@
         setupThemeToggle();
 
         // Gestion des formulaires
-        const postForm = document.getElementById('postForm');
-        const postSection = document.getElementById('postSection');
-        const toggleBtn = document.getElementById('togglePostBtn');
-        const cancelBtn = document.getElementById('cancelPostBtn');
+        const postForm = document.getElementById("postForm");
+        const postSection = document.getElementById("postSection");
+        const toggleBtn = document.getElementById("togglePostBtn");
+        const cancelBtn = document.getElementById("cancelPostBtn");
 
         function toggleForm() {
-            const isHidden = postSection.classList.contains('hidden');
+            const isHidden = postSection.classList.contains("hidden");
             if (isHidden) {
-                postSection.classList.remove('hidden');
-                toggleBtn.classList.add('hidden'); // Masquer le bouton principal
+                postSection.classList.remove("hidden");
+                toggleBtn.classList.add("hidden"); // Masquer le bouton principal
             } else {
-                postSection.classList.add('hidden');
-                toggleBtn.classList.remove('hidden'); // Afficher le bouton principal
+                postSection.classList.add("hidden");
+                toggleBtn.classList.remove("hidden"); // Afficher le bouton principal
             }
         }
 
-        toggleBtn.addEventListener('click', toggleForm);
-        cancelBtn.addEventListener('click', toggleForm);
+        toggleBtn.addEventListener("click", toggleForm);
+        cancelBtn.addEventListener("click", toggleForm);
 
         // Validation et logique de soumission
-        const postImageInput = document.getElementById('postImage');
-        const uploadStatus = document.getElementById('uploadStatus');
+        const postImageInput = document.getElementById("postImage");
+        const uploadStatus = document.getElementById("uploadStatus");
 
-        postImageInput.addEventListener('change', function () {
+        postImageInput.addEventListener("change", function () {
             const file = this.files[0];
 
             if (file) {
                 // Valider le type de fichier
-                if (!file.type.startsWith('image/')) {
-                    uploadStatus.textContent = "❌ Veuillez sélectionner une image valide.";
+                if (!file.type.startsWith("image/")) {
+                    uploadStatus.textContent =
+                        "❌ Veuillez sélectionner une image valide.";
                     uploadStatus.className = "status-msg error";
                     return;
                 }
@@ -156,10 +160,11 @@
             }
         });
 
-        postForm.addEventListener('submit', (e) => {
+        postForm.addEventListener("submit", (e) => {
             if (!postImageInput.files[0]) {
                 e.preventDefault();
-                uploadStatus.textContent = "❌ Vous devez choisir une photo.";
+                uploadStatus.textContent =
+                    "❌ Vous devez choisir une photo.";
                 uploadStatus.className = "status-msg error";
             }
         });
