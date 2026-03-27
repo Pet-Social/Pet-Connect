@@ -1,186 +1,141 @@
+html{
+    height: 100%;
+}
+main {
+    flex: 1;
+}
+:root {
+    --primary-color: #4a90e2;
+    --primary-hover: #357abd;
+    --bg-color: #f8f9fa;
+    --text-color: #2d3436;
+    --text-muted: #636e72;
+    --card-bg: #ffffff;
+    --header-bg: rgba(255, 255, 255, 0.95);
+    --border-color: #dfe6e9;
+    --input-bg: #ffffff;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --radius: 12px;
+    --submit-button-bg: #ffffff;
+    --submit-button-text: #000000;
+}
+
+[data-theme="dark"] {
+    --primary-color: #5d9cec;
+    --primary-hover: #4a90e2;
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --card-bg: #1e1e1e;
+    --header-bg: rgba(30, 30, 30, 0.95);
+    --border-color: #333333;
+    --input-bg: #2d2d2d;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --submit-button-bg: #000000;
+    --submit-button-text: #ffffff;
+}
+
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: "Outfit", "Segoe UI", Arial, sans-serif;
-}
-
-:root {
-    --primary-color: #38bdf8;
-    --secondary-color: #0369a1;
-    --background-dark: #212121;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-}
-
-/* Light theme variables */
-[data-theme="light"] {
-    --primary-color: #0284c7;
-    --secondary-color: #0ea5e9;
-    --background-dark: #e8e8e8;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
 }
 
 body {
-    background-color: var(--background-dark);
-    color: var(--text-primary);
-    transition: color 0.3s ease;
-}
-
-header {
-    text-align: center;
-    padding: 2em 1.5em;
-    background-color: var(--secondary-color);
-    position: relative;
-    transition: background-color 0.3s ease;
-}
-
-header h1 {
-    color: #fefefe;
-}
-
-.theme-toggle {
-    position: absolute;
-    top: 1em;
-    right: 1em;
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.5em;
-}
-
-footer {
-    text-align: center;
-    background-color: var(--card-background);
-    color: var(--text-secondary);
-    border-top: 1px solid var(--border-color);
-    margin-top: 4em;
-    transition: background-color 0.3s ease;
-}
-
-/* From Uiverse.io by cssbuttons-io */
-.submit-btn {
-    align-items: center;
-    background-image: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb);
-    border: 0;
-    border-radius: 8px;
-    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
-    box-sizing: border-box;
-    color: #ffffff;
-    display: flex;
-    font-size: 18px;
-    justify-content: center;
-    line-height: 1em;
-    max-width: 100%;
-    min-width: fit-content;
-    padding: 3px;
-    text-decoration: none;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.submit-btn:active,
-.submit-btn:hover {
-    outline: 0;
-}
-
-.submit-btn span {
-    background-color: rgb(5, 6, 45);
-    padding: 16px 16px;
-    border-radius: 6px;
-    width: 100%;
+    font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background: var(--bg-color);
+    transition: background 0.3s ease, color 0.3s ease;
     height: 100%;
-    transition: 300ms;
-}
-
-.submit-btn:hover span {
-    background: none;
-}
-
-.submit-btn:active {
-    transform: scale(0.9);
-}
-
-.hidden {
-    display: none;
-}
-
-.custum-file-upload {
-    height: 200px;
-    width: auto;
-    max-width: calc(100% - 66px);
-    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed #cacaca;
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0px 48px 35px -48px rgba(0, 0, 0, 0.1);
 }
 
-.custum-file-upload .icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: 0.2s ease;
 }
 
-.custum-file-upload .icon svg {
-    height: 80px;
-    width: 80px;
-    fill: var(--primary-color);
-}
-
-.custum-file-upload .text {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.custum-file-upload input {
-    display: none;
-}
-
-.status-msg {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.status-msg.error {
-    color: #ef4444;
-}
-
-.status-msg.success {
-    color: #22c55e;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.mb-4 {
-    margin-bottom: 1.5em;
+ul {
+    list-style: none;
 }
 
 .container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 0 1.5em;
+    padding: 0 1.5rem;
+}
+
+header {
+    background: var(--header-bg);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-bottom: 2rem;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-links a {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--primary-color);
+}
+
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    color: var(--text-muted);
+    border-radius: 50%;
+    transition: 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(128,128,128,0.1);
+    color: var(--primary-color);
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: 0.2s ease;
+
+}
+
+.card:hover {
+    transform: translateY(-2px);
 }
 
 .form-group {
@@ -191,7 +146,6 @@ footer {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--text-color);
     font-size: 0.9rem;
 }
 
@@ -201,70 +155,162 @@ footer {
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
-    transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
     font-family: inherit;
-    background-color: var(--input-bg);
+    background: var(--input-bg);
     color: var(--text-color);
+    transition: 0.2s ease;
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
-.card {
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+textarea.form-control {
+    min-height: 120px;
+    resize: none;
+}
+
+.custum-file-upload {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
     padding: 2rem;
-    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-align: center;
+}
+
+.custum-file-upload:hover {
+    border-color: var(--primary-color);
+    background: rgba(74, 144, 226, 0.05);
+}
+
+.custum-file-upload input {
+    display: none;
+}
+
+.custum-file-upload svg {
+    width: 50px;
+    height: 50px;
+    fill: var(--primary-color);
+}
+
+.post-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
     border: none;
-    transition: transform 0.2s ease, background-color 0.3s ease;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.btn:hover {
+    background: var(--primary-hover);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-image: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb);
+    max-width: 100%;
+}
+
+.submit-btn span {
+    background: var(--submit-button-bg);
+    color: var(--submit-button-text);
+    padding: 16px;
+    border-radius: 6px;
+    width: 100%;
+    transition: 0.3s ease;
+    font-size: large;
+}
+
+.submit-btn:hover span {
+    background: none;
+    color: #fff;
+}
+.post-actions .btn {
+    flex: 1 1 auto; 
+    min-width: 120px; 
+}
+
+footer {
+    text-align: center;
+    padding: 1.2rem 0;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
 }
 
 .hidden {
     display: none;
 }
 
-.custum-file-upload {
-    height: 100px;
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: space-between;
-    gap: 20px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed #cacaca;
-    background-color: rgba(255, 255, 255, 1);
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0px 48px 35px -48px rgba(0, 0, 0, 0.1);
+.text-center {
+    text-align: center;
 }
 
-.custum-file-upload .icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.mb-4 {
+    margin-bottom: 1.5rem;
 }
 
-.custum-file-upload .icon svg {
-    height: 80px;
-    fill: rgba(75, 85, 99, 1);
-}
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+    }
 
-.custum-file-upload .text {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+    }
 
-.custum-file-upload .text span {
-    font-weight: 400;
-    color: rgba(75, 85, 99, 1);
-}
+    .post-actions {
+        flex-direction: column;
+    }
 
-.custum-file-upload input {
-    display: none;
+    .post-actions .btn {
+        width: 100%;
+    }
+
+    .submit-btn {
+        width: 100%;
+    }
+
+    .submit-btn span {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
 }

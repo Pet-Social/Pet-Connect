@@ -21,17 +21,26 @@
 
 <body>
     <header>
-        <h1>Pet Connect</h1>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-            <span id="theme-icon">🌙</span>
-        </button>
+        <div class="container navbar">
+            <a href="index.html" class="logo">🐾 Pet Connect</a>
+            <nav class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="adoption.html">Adoption</a>
+                <a href="shop.html">Shop</a>
+                <a href="vets.html">Vets</a>
+                <a href="tips.html">Tips</a>
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </nav>
+        </div>
     </header>
 
     <main class="container">
         <div class="text-center mb-4">
             <br>
             <button class="submit-btn" id="togglePostBtn" style="margin: 0 auto;">
-                <span>📸 Partager un moment de votre animal</span>
+                <span>📸 Share a moment with your pet</span>
             </button>
             <br>
         </div>
@@ -64,7 +73,7 @@
                     <textarea id="postCaption" class="form-control"
                         placeholder="What is your pet doing today?"></textarea>
                 </div>
-                <div style="display: flex; gap: 1rem;">
+                <div class="post-actions">
                     <button type="submit" class="btn">Post Moment</button>
                     <button type="button" id="cancelPostBtn" class="btn btn-secondary">Cancel</button>
                 </div>
