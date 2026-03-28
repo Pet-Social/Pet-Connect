@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Connect</title>
+    <meta name="description"
+        content="Une application sociale ouverte pour animaux de compagnie : offrant un espace aux utilisateurs pour partager leurs moments spéciaux, en apprendre plus sur leurs animaux et un espace pour l'adoption d'animaux. " />
+    <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./styles.css" />
+
+    <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
+
+    <!-- Preconnect to external domains-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+
+<body>
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo">🐾 Pet Connect</a>
+            <nav class="nav-links">
+                <a href="index.html">Accueil</a>
+                <a href="adoption.html">Adoption</a>
+                <a href="shop.html">Boutique</a>
+                <a href="vets.html">Vétérinaires</a>
+                <a href="tips.html" class="active">Conseils</a>
+                <button id="theme-toggle" class="theme-toggle-btn" title="Changer le thème">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!--Placez votre code ici-->
+    </main>
+
+    <footer>
+        <p>© 2026 L2 INFO ISIMM.</p>
+    </footer>
+
+</body>
+<script>
+    // Fonction de basculement du thème
+    function setupThemeToggle() {
+        const themeToggle = document.getElementById("theme-toggle");
+        const themeIcon = document.getElementById("theme-icon");
+
+        // Vérifier la préférence de thème enregistrée ou par défaut sur sombre
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateThemeIcon(savedTheme);
+
+        themeToggle.addEventListener("click", () => {
+            const currentTheme =
+                document.documentElement.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+            document.documentElement.setAttribute(
+                "data-theme",
+                newTheme,
+            );
+            localStorage.setItem("theme", newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            themeIcon.textContent = theme === "dark" ? "🌙" : "☀️";
+        }
+    }
+    setupThemeToggle();
+</script>
+
+</html>
