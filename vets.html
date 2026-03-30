@@ -1,78 +1,379 @@
 <!doctype html>
 <html lang="fr">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pet Connect</title>
-    <meta name="description"
-        content="Une application sociale ouverte pour animaux de compagnie : offrant un espace aux utilisateurs pour partager leurs moments spéciaux, en apprendre plus sur leurs animaux et un espace pour l'adoption d'animaux. " />
-    <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
-
+    <title>Pet Connect – Vétérinaires</title>
+    <meta
+      name="description"
+      content="Trouvez un vétérinaire de confiance pour votre animal de compagnie."
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
-
-    <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
-
-    <!-- Preconnect to external domains-->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="assets/images/default-pet.svg"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-</head>
+  </head>
 
-<body>
+  <body>
     <header>
-        <div class="container navbar">
-            <a href="index.html" class="logo">🐾 Pet Connect</a>
-            <nav class="nav-links">
-                <a href="index.html">Accueil</a>
-                <a href="adoption.html">Adoption</a>
-                <a href="shop.html">Boutique</a>
-                <a href="vets.html" class="active">Vétérinaires</a>
-                <a href="tips.html">Conseils</a>
-                <button id="theme-toggle" class="theme-toggle-btn" title="Changer le thème">
-                    <span id="theme-icon">🌙</span>
-                </button>
-            </nav>
-        </div>
+      <div class="container navbar">
+        <a href="index.html" class="logo">🐾 Pet Connect</a>
+        <nav class="nav-links">
+          <a href="index.html">Accueil</a>
+          <a href="adoption.html">Adoption</a>
+          <a href="shop.html">Boutique</a>
+          <a href="vets.html" class="active">Vétérinaires</a>
+          <a href="tips.html">Conseils</a>
+          <button
+            id="theme-toggle"
+            class="theme-toggle-btn"
+            title="Changer le thème"
+          >
+            <span id="theme-icon">🌙</span>
+          </button>
+        </nav>
+      </div>
     </header>
 
     <main class="container">
-        <!--Placez votre code ici-->
+      <h1 class="text-center mb-4">Vétérinaires 🩺</h1>
+
+      <!-- Add vet button -->
+      <div class="text-center mb-4">
+        <button class="submit-btn" id="toggleVetFormBtn" style="margin: 0 auto">
+          <span>➕ Ajouter un vétérinaire</span>
+        </button>
+      </div>
+
+      <!-- Add vet form -->
+      <section id="vetFormSection" class="card hidden">
+        <h2 class="mb-4">Ajouter un vétérinaire</h2>
+        <form id="vetForm">
+          <div class="form-group">
+            <label for="vetName">Nom complet *</label>
+            <input
+              type="text"
+              id="vetName"
+              class="form-control"
+              placeholder="Dr. Prénom Nom"
+              required
+            />
+          </div>
+
+          <div class="vet-form-row">
+            <div class="form-group">
+              <label for="vetSpecialty">Spécialité *</label>
+              <input
+                type="text"
+                id="vetSpecialty"
+                class="form-control"
+                placeholder="ex: Généraliste, Chirurgie…"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="vetStatus">Disponibilité *</label>
+              <select id="vetStatus" class="form-control" required>
+                <option value="">-- Choisir --</option>
+                <option value="open">Ouvert</option>
+                <option value="closed">Fermé</option>
+                <option value="urgences">Urgences uniquement</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="vetAddress">Adresse *</label>
+            <input
+              type="text"
+              id="vetAddress"
+              class="form-control"
+              placeholder="ex: 12 Rue de Carthage, Tunis"
+              required
+            />
+          </div>
+
+          <div class="vet-form-row">
+            <div class="form-group">
+              <label for="vetPhone">Téléphone *</label>
+              <input
+                type="tel"
+                id="vetPhone"
+                class="form-control"
+                placeholder="+216 XX XXX XXX"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="vetHours">Horaires *</label>
+              <input
+                type="text"
+                id="vetHours"
+                class="form-control"
+                placeholder="ex: Lun–Sam : 08h00 – 18h00"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="post-actions">
+            <button type="submit" class="btn">Ajouter</button>
+            <button type="button" id="cancelVetBtn" class="btn btn-secondary">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Search bar (only shown when there are vets) -->
+      <div id="searchWrapper" class="form-group mb-4 hidden">
+        <input
+          type="text"
+          id="searchInput"
+          class="form-control"
+          placeholder="Rechercher par nom, ville ou spécialité…"
+          oninput="filterVets()"
+        />
+      </div>
+
+      <!-- Vet cards grid -->
+      <div class="vet-grid" id="vetGrid"></div>
+
+      <!-- Empty state -->
+      <div id="emptyState" class="vet-empty-state">
+        <div class="vet-empty-icon">🏥</div>
+        <p>Aucun vétérinaire enregistré pour l'instant.</p>
+        <p>Soyez le premier à en ajouter un !</p>
+      </div>
+
+      <!-- No search results -->
+      <p id="noResults" class="vet-no-results hidden">Aucun résultat trouvé.</p>
     </main>
 
     <footer>
-        <p>© 2026 L2 INFO ISIMM.</p>
+      <p>© 2026 L2 INFO ISIMM.</p>
     </footer>
 
-</body>
-<script>
-    // Fonction de basculement du thème
-    function setupThemeToggle() {
-        const themeToggle = document.getElementById("theme-toggle");
-        const themeIcon = document.getElementById("theme-icon");
-
-        // Vérifier la préférence de thème enregistrée ou par défaut sur sombre
-        const savedTheme = localStorage.getItem("theme") || "dark";
-        document.documentElement.setAttribute("data-theme", savedTheme);
+    <script>
+      // ── Theme toggle ──────────────────────────────────────────────
+      function setupThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
-
-        themeToggle.addEventListener("click", () => {
-            const currentTheme =
-                document.documentElement.getAttribute("data-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-            document.documentElement.setAttribute(
-                "data-theme",
-                newTheme,
-            );
-            localStorage.setItem("theme", newTheme);
-            updateThemeIcon(newTheme);
+        themeToggle.addEventListener('click', () => {
+          const newTheme =
+            document.documentElement.getAttribute('data-theme') === 'dark'
+              ? 'light'
+              : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+          updateThemeIcon(newTheme);
         });
-
         function updateThemeIcon(theme) {
-            themeIcon.textContent = theme === "dark" ? "🌙" : "☀️";
+          themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
         }
-    }
-    setupThemeToggle();
-</script>
+      }
+      setupThemeToggle();
 
+      // ── Accent colours (cycled for each vet) ─────────────────────
+      const ACCENT_CLASSES = [
+        'accent-blue',
+        'accent-green',
+        'accent-orange',
+        'accent-red',
+        'accent-purple',
+        'accent-teal',
+      ];
+
+      // ── Persistence ───────────────────────────────────────────────
+      function loadVets() {
+        try {
+          return JSON.parse(localStorage.getItem('petconnect_vets')) || [];
+        } catch {
+          return [];
+        }
+      }
+
+      function saveVets(vets) {
+        localStorage.setItem('petconnect_vets', JSON.stringify(vets));
+      }
+
+      // ── Render helpers ────────────────────────────────────────────
+      const STATUS_LABELS = {
+        open: 'Ouvert',
+        closed: 'Fermé',
+        urgences: 'Urgences uniquement',
+      };
+
+      function renderCard(vet, index) {
+        const accent = ACCENT_CLASSES[index % ACCENT_CLASSES.length];
+        const statusLabel = STATUS_LABELS[vet.status] || vet.status;
+        const searchKey =
+          `${vet.name} ${vet.specialty} ${vet.address}`.toLowerCase();
+        const phoneRaw = vet.phone.replace(/\s/g, '');
+
+        return `
+          <div class="vet-card" data-info="${searchKey}">
+            <div class="vet-card-accent ${accent}"></div>
+            <div class="vet-avatar">${vet.name[4]}</div>
+            <div>
+              <div class="vet-name">${vet.name}</div>
+              <span class="vet-specialty">${vet.specialty}</span>
+            </div>
+            <div class="vet-info-list">
+              <div class="vet-info-item">📍 <span>${vet.address}</span></div>
+              <div class="vet-info-item">📞 <span>${vet.phone}</span></div>
+              <div class="vet-info-item">🕐 <span>${vet.hours}</span></div>
+            </div>
+            <span class="vet-status ${vet.status}">${statusLabel}</span>
+            <div class="vet-card-footer">
+              <button class="vet-btn vet-btn-primary" onclick="callVet('${phoneRaw}', '${vet.phone}', this)">
+                Appeler
+              </button>
+              <button class="vet-btn vet-btn-secondary" onclick="deleteVet(${index})" title="Supprimer">
+                Supprimer
+              </button>
+            </div>
+          </div>`;
+      }
+
+      // ── Call + copy ───────────────────────────────────────────────
+      function callVet(phoneRaw, phoneDisplay, btn) {
+        // Attempt the tel: link (works on mobile / desktop with a phone app)
+        window.location.href = 'tel:' + phoneRaw;
+
+        // Also copy to clipboard for desktop users
+        navigator.clipboard
+          .writeText(phoneDisplay)
+          .then(() => {
+            showToast('📋 Numéro copié : ' + phoneDisplay);
+          })
+          .catch(() => {
+            // Clipboard blocked (e.g. non-HTTPS) — just show the number
+            showToast('📞 ' + phoneDisplay);
+          });
+      }
+
+      // ── Toast notification ────────────────────────────────────────
+      function showToast(message) {
+        const old = document.getElementById('vetToast');
+        if (old) old.remove();
+
+        const toast = document.createElement('div');
+        toast.id = 'vetToast';
+        toast.className = 'vet-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(() => toast.classList.add('vet-toast--visible'));
+
+        setTimeout(() => {
+          toast.classList.remove('vet-toast--visible');
+          toast.addEventListener('transitionend', () => toast.remove(), {
+            once: true,
+          });
+        }, 3000);
+      }
+
+      function renderAll() {
+        const vets = loadVets();
+        const grid = document.getElementById('vetGrid');
+        const emptyState = document.getElementById('emptyState');
+        const searchWrap = document.getElementById('searchWrapper');
+
+        grid.innerHTML = vets.map(renderCard).join('');
+
+        const hasVets = vets.length > 0;
+        emptyState.classList.toggle('hidden', hasVets);
+        searchWrap.classList.toggle('hidden', !hasVets);
+        document.getElementById('noResults').classList.add('hidden');
+
+        const query = document.getElementById('searchInput').value;
+        if (query) filterVets();
+      }
+
+      // ── Form toggle ───────────────────────────────────────────────
+      const vetFormSection = document.getElementById('vetFormSection');
+      const toggleBtn = document.getElementById('toggleVetFormBtn');
+      const cancelBtn = document.getElementById('cancelVetBtn');
+
+      function toggleForm(forceClose = false) {
+        const isHidden = vetFormSection.classList.contains('hidden');
+        if (forceClose || !isHidden) {
+          vetFormSection.classList.add('hidden');
+          toggleBtn.classList.remove('hidden');
+        } else {
+          vetFormSection.classList.remove('hidden');
+          toggleBtn.classList.add('hidden');
+        }
+      }
+
+      toggleBtn.addEventListener('click', () => toggleForm());
+      cancelBtn.addEventListener('click', () => {
+        document.getElementById('vetForm').reset();
+        toggleForm(true);
+      });
+
+      // ── Form submission ───────────────────────────────────────────
+      document.getElementById('vetForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const newVet = {
+          name: document.getElementById('vetName').value.trim(),
+          specialty: document.getElementById('vetSpecialty').value.trim(),
+          status: document.getElementById('vetStatus').value,
+          address: document.getElementById('vetAddress').value.trim(),
+          phone: document.getElementById('vetPhone').value.trim(),
+          hours: document.getElementById('vetHours').value.trim(),
+        };
+
+        const vets = loadVets();
+        vets.push(newVet);
+        saveVets(vets);
+
+        document.getElementById('vetForm').reset();
+        toggleForm(true);
+        renderAll();
+      });
+
+      // ── Delete ────────────────────────────────────────────────────
+      function deleteVet(index) {
+        if (!confirm('Supprimer ce vétérinaire ?')) return;
+        const vets = loadVets();
+        vets.splice(index, 1);
+        saveVets(vets);
+        renderAll();
+      }
+
+      // ── Search ────────────────────────────────────────────────────
+      function filterVets() {
+        const query = document
+          .getElementById('searchInput')
+          .value.toLowerCase();
+        const cards = document.querySelectorAll('.vet-card');
+        let visible = 0;
+        cards.forEach((card) => {
+          const match = card.dataset.info.includes(query);
+          card.style.display = match ? '' : 'none';
+          if (match) visible++;
+        });
+        document
+          .getElementById('noResults')
+          .classList.toggle('hidden', visible > 0);
+      }
+
+      // ── Init ──────────────────────────────────────────────────────
+      renderAll();
+    </script>
+  </body>
 </html>
