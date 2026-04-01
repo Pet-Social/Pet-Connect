@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="./styles.css" />
-
     <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
 
     <!-- Preconnect to external domains-->
@@ -42,6 +41,7 @@
                 <span>📸 Partagez un moment avec votre animal</span>
             </button>
             <br>
+            <section id="postsContainer" class="container"></section>
         </div>
         <section id="postSection" class="card hidden">
             <h2 class="mb-4">Créer une publication</h2>
@@ -87,88 +87,6 @@
     <footer>
         <p>© 2026 L2 INFO ISIMM.</p>
     </footer>
-
-    <script>
-        // Fonction de basculement du thème
-        function setupThemeToggle() {
-            const themeToggle = document.getElementById("theme-toggle");
-            const themeIcon = document.getElementById("theme-icon");
-
-            // Vérifier la préférence de thème enregistrée ou par défaut sur sombre
-            const savedTheme = localStorage.getItem("theme") || "dark";
-            document.documentElement.setAttribute("data-theme", savedTheme);
-            updateThemeIcon(savedTheme);
-
-            themeToggle.addEventListener("click", () => {
-                const currentTheme =
-                    document.documentElement.getAttribute("data-theme");
-                const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-                document.documentElement.setAttribute(
-                    "data-theme",
-                    newTheme,
-                );
-                localStorage.setItem("theme", newTheme);
-                updateThemeIcon(newTheme);
-            });
-
-            function updateThemeIcon(theme) {
-                themeIcon.textContent = theme === "dark" ? "🌙" : "☀️";
-            }
-        }
-        setupThemeToggle();
-
-        // Gestion des formulaires
-        const postForm = document.getElementById("postForm");
-        const postSection = document.getElementById("postSection");
-        const toggleBtn = document.getElementById("togglePostBtn");
-        const cancelBtn = document.getElementById("cancelPostBtn");
-
-        function toggleForm() {
-            const isHidden = postSection.classList.contains("hidden");
-            if (isHidden) {
-                postSection.classList.remove("hidden");
-                toggleBtn.classList.add("hidden"); // Masquer le bouton principal
-            } else {
-                postSection.classList.add("hidden");
-                toggleBtn.classList.remove("hidden"); // Afficher le bouton principal
-            }
-        }
-
-        toggleBtn.addEventListener("click", toggleForm);
-        cancelBtn.addEventListener("click", toggleForm);
-
-        // Validation et logique de soumission
-        const postImageInput = document.getElementById("postImage");
-        const uploadStatus = document.getElementById("uploadStatus");
-
-        postImageInput.addEventListener("change", function () {
-            const file = this.files[0];
-
-            if (file) {
-                // Valider le type de fichier
-                if (!file.type.startsWith("image/")) {
-                    uploadStatus.textContent =
-                        "❌ Veuillez sélectionner une image valide.";
-                    uploadStatus.className = "status-msg error";
-                    return;
-                }
-                uploadStatus.textContent = "✅ Image prête !";
-                uploadStatus.className = "status-msg success";
-            } else {
-                uploadStatus.textContent = "";
-            }
-        });
-
-        postForm.addEventListener("submit", (e) => {
-            if (!postImageInput.files[0]) {
-                e.preventDefault();
-                uploadStatus.textContent =
-                    "❌ Vous devez choisir une photo.";
-                uploadStatus.className = "status-msg error";
-            }
-        });
-    </script>
+    <script src="./index.js"></script>
 </body>
-
 </html>
