@@ -285,6 +285,76 @@ footer {
     margin-bottom: 1.5rem;
 }
 
+.posts-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.post-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.post-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.post-date {
+    font-size: 0.8rem;
+    color: gray;
+}
+
+.post-image {
+    width: 75%;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.post-caption {
+    font-size: 0.95rem;
+}
+
+.hidden {
+    display: none;
+}
+.post-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    transition: 0.2s ease;
+}
+
+.post-card img.post-image {
+    width: 100%;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+}
+
+.post-header {
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+}
+
+.post-date {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.post-caption {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;
