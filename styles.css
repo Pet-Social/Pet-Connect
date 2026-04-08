@@ -295,215 +295,42 @@ footer {
   margin-bottom: 1.5rem;
 }
 
-/* ── Vétérinaires ─────────────────────────────────────────────── */
-.vet-grid {
-  display: flex;
-  flex-direction: row;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-color) transparent;
-}
-
-.vet-grid::-webkit-scrollbar {
-  height: 6px;
-}
-.vet-grid::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
+/* ── Vets + Shared Grid ───────────────────────────────────────── */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
 }
 
 .vet-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  min-width: 260px;
-  max-width: 260px;
+  margin-bottom: 0;
+  padding: 1.25rem;
 }
 
-.vet-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+.vet-card h3 {
+  margin-bottom: 0.4rem;
 }
 
-/* Accent bar */
-.vet-card-accent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-}
-.accent-blue {
-  background: linear-gradient(90deg, #4a90e2, #7b5ea7);
-}
-.accent-green {
-  background: linear-gradient(90deg, #27ae60, #1abc9c);
-}
-.accent-orange {
-  background: linear-gradient(90deg, #e67e22, #f39c12);
-}
-.accent-red {
-  background: linear-gradient(90deg, #e74c3c, #c0392b);
-}
-.accent-purple {
-  background: linear-gradient(90deg, #9b59b6, #8e44ad);
-}
-.accent-teal {
-  background: linear-gradient(90deg, #16a085, #1abc9c);
-}
-
-.vet-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color), #7b5ea7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  flex-shrink: 0;
-}
-
-.vet-name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-color);
-}
-
-.vet-specialty {
-  display: inline-block;
-  background: rgba(74, 144, 226, 0.12);
-  color: var(--primary-color);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.2rem 0.65rem;
-  border-radius: 20px;
-  width: fit-content;
-}
-
-.vet-info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.vet-info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  font-size: 0.88rem;
+.vet-card > p {
   color: var(--text-muted);
+  margin-bottom: 0.9rem;
 }
 
-.vet-rating {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.stars {
-  color: #f4c430;
-  letter-spacing: -1px;
-  font-size: 0.95rem;
-}
-.rating-text {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-
-.vet-status {
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.2rem 0.65rem;
-  border-radius: 20px;
-  width: fit-content;
-}
-.vet-status.open {
-  background: rgba(39, 174, 96, 0.12);
-  color: #27ae60;
-}
-.vet-status.closed {
-  background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
-}
-.vet-status.urgences {
-  background: rgba(243, 156, 18, 0.12);
-  color: #f39c12;
-}
-
-.vet-card-footer {
-  margin-top: auto;
-  padding-top: 0.75rem;
+.vet-contact {
   border-top: 1px solid var(--border-color);
-  display: flex;
-  gap: 0.6rem;
+  padding-top: 0.75rem;
 }
 
-.vet-btn {
-  flex: 1;
-  padding: 0.55rem 0.8rem;
-  border-radius: 8px;
-  border: none;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
+.vet-contact p {
+  margin: 0;
 }
-.vet-btn-primary {
-  background: var(--primary-color);
-  color: #fff;
+
+.vet-contact p + p {
+  margin-top: 0.5rem;
 }
-.vet-btn-primary:hover {
-  background: var(--primary-hover);
-}
-.vet-btn-secondary {
-  background: transparent;
-  border: 1.5px solid var(--border-color);
-  color: var(--text-color);
-}
-.vet-btn-secondary:hover {
-  border-color: var(--primary-color);
+
+.vet-contact a {
   color: var(--primary-color);
-}
-
-.vet-no-results {
-  text-align: center;
-  color: var(--text-muted);
-}
-
-.vet-form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-@media (max-width: 600px) {
-  .vet-form-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-.vet-empty-state {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 3rem 1rem;
-}
-
-.vet-empty-icon {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
 }
 
 /* ── Responsive ───────────────────────────────────────────────── */
