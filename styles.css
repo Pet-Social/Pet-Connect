@@ -269,6 +269,7 @@ textarea.form-control {
   background: none;
   color: #fff;
 }
+
 .post-actions .btn {
   flex: 1 1 auto;
   min-width: 120px;
@@ -298,7 +299,7 @@ footer {
 /* ── Vets + Shared Grid ───────────────────────────────────────── */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.25rem;
 }
 
@@ -333,6 +334,17 @@ footer {
   color: var(--primary-color);
 }
 
+.vet-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+#no-results {
+  color: var(--text-muted);
+  margin-top: 2rem;
+}
+
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .navbar {
@@ -363,6 +375,7 @@ footer {
     font-size: 0.95rem;
   }
 }
+
 /* ── Toast notification ───────────────────────────────────────── */
 .vet-toast {
   position: fixed;

@@ -33,13 +33,13 @@
 
       <input class="form-control mb-4" type="text" id="search" placeholder="Rechercher un vétérinaire..." aria-label="Rechercher un vétérinaire"/>
 
-      <div class="grid-container" id="vet-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="grid-container" id="vet-grid">
 
         <article class="card vet-card" data-name="animacare wissem ketata teniour">
           <h3>Clinique AnimaCare</h3>
           <p>Route de Teniour, 1.5 km du centre-ville, Sfax</p>
-          <p style="font-size:0.85rem; color:var(--text-muted);">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.7</p>
-          <p style="font-size:0.85rem; color:var(--text-muted);">Lun–Sam : 9h–19h</p>
+          <p class="vet-meta">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.7</p>
+          <p class="vet-meta">Lun–Sam : 9h–19h</p>
           <div class="vet-contact">
             <p><strong>Tél :</strong> <a href="tel:+21695080695" onclick="showToast('Appel en cours...')">+216 95 080 695</a></p>
             <p><a href="https://www.google.com/maps/search/Clinique+Vétérinaire+AnimaCare+Sfax" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
@@ -49,8 +49,8 @@
         <article class="card vet-card" data-name="louati zouhir sfax sud aeroport">
           <h3>Dr. Zouhir Louati</h3>
           <p>Route de l'Aéroport KM 0.5, Sfax Sud 3083</p>
-          <p style="font-size:0.85rem; color:var(--text-muted);">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.5</p>
-          <p style="font-size:0.85rem; color:var(--text-muted);">Lun–Ven : 8h–18h &nbsp;|&nbsp; Sam : 8h–13h</p>
+          <p class="vet-meta">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.5</p>
+          <p class="vet-meta">Lun–Ven : 8h–18h &nbsp;|&nbsp; Sam : 8h–13h</p>
           <div class="vet-contact">
             <p><strong>Tél :</strong> <a href="tel:+21674000000" onclick="showToast('Appel en cours...')">+216 74 000 000</a></p>
             <p><a href="https://www.google.com/maps/search/Dr+Louati+Zouhir+vétérinaire+Sfax+Sud" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
@@ -60,8 +60,8 @@
         <article class="card vet-card" data-name="clinique amal route mahdia sfax">
           <h3>Clinique Vétérinaire Amal</h3>
           <p>Route de Mahdia KM 9, Sfax</p>
-          <p style="font-size:0.85rem; color:var(--text-muted);">🐇 Tous animaux &nbsp;|&nbsp; ⭐ 4.8</p>
-          <p style="font-size:0.85rem; color:var(--text-muted);">Lun–Sam : 9h–20h</p>
+          <p class="vet-meta">🐇 Tous animaux &nbsp;|&nbsp; ⭐ 4.8</p>
+          <p class="vet-meta">Lun–Sam : 9h–20h</p>
           <div class="vet-contact">
             <p><strong>Tél :</strong> <a href="tel:+21674000001" onclick="showToast('Appel en cours...')">+216 74 000 001</a></p>
             <p><a href="https://www.google.com/maps/search/Clinique+Vétérinaire+Amal+Route+Mahdia+Sfax" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
@@ -70,7 +70,7 @@
 
       </div>
 
-      <p class="hidden text-center" id="no-results" style="color:var(--text-muted); margin-top:2rem;">
+      <p class="hidden text-center" id="no-results">
         Aucun vétérinaire trouvé pour cette recherche.
       </p>
     </main>
