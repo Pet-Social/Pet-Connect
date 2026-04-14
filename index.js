@@ -215,3 +215,86 @@ checkUserSession();
 
 setupAuthModal();
 loadTestPosts();
+setupPostUpload();
+
+// Function to handle image upload to Supabase Storage (S3 compatible)
+function setupPostUpload() {
+    if (!postForm) return;
+
+    postForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById("postImage");
+        const captionInput = document.getElementById("postCaption");
+        const file = fileInput.files[0];
+        const caption = captionInput.value;
+
+        if (!file) {
+            alert("Veuillez sélectionner une image.");
+            return;
+        }
+
+        const uploadStatus = document.getElementById("uploadStatus");
+        if (uploadStatus) {
+            uploadStatus.textContent = "Téléchargement en cours...";
+            uploadStatus.style.color = "blue";
+        }
+
+        try {
+            // Generate a unique file name
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+            const filePath = `posts/${fileName}`; // Save in 'posts' folder
+
+            // Ensure you have a bucket named 'images' in your Supabase Storage
+            const { data, error } = await supabaseClient.storage
+                .from('images')
+                .upload(filePath, file);
+
+            if (error) {
+                throw error;
+            }
+
+            // Get the public URL for the uploaded image
+            const { data: publicUrlData } = supabaseClient.storage
+                .from('images')
+                .getPublicUrl(filePath);
+
+            const imageUrl = publicUrlData.publicUrl;
+
+            if (uploadStatus) {
+                uploadStatus.textContent = "Image publiée avec succès !";
+                uploadStatus.style.color = "green";
+            }
+
+            // Add the new post dynamically to the UI
+            const owner = "Moi (Maintenant)";
+            const date = new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString();
+
+            const post = document.createElement("div");
+            post.classList.add("post-card");
+            post.innerHTML = `
+                <div class="post-header">${owner} <div class="post-date">${date}</div></div>
+                <img src="${imageUrl}" class="post-image" />
+                <div class="post-caption">${caption}</div>
+            `;
+            postsContainer.prepend(post);
+
+            // Reset form and close
+            postForm.reset();
+            setTimeout(() => {
+                if (uploadStatus) uploadStatus.textContent = "";
+                toggleForm(); // Hide form and show posts
+            }, 1500);
+
+        } catch (error) {
+            console.error("Erreur de téléchargement:", error.message);
+            if (uploadStatus) {
+                uploadStatus.textContent = "Erreur: " + error.message;
+                uploadStatus.style.color = "red";
+            } else {
+                alert("Erreur: " + error.message);
+            }
+        }
+    });
+}
