@@ -635,3 +635,94 @@ footer {
 .login-prompt-overlay.hidden {
     display: none;
 }
+
+/* Posts Filter */
+.posts-filter {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.filter-btn {
+    padding: 0.5rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    background: transparent;
+    color: var(--text-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Post Actions (Edit/Delete buttons) */
+.post-card {
+    position: relative;
+}
+
+.post-owner-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.post-edit-btn,
+.post-delete-btn {
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.post-edit-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.post-edit-btn:hover {
+    background: var(--primary-hover);
+}
+
+.post-delete-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.post-delete-btn:hover {
+    background: #c0392b;
+}
+
+/* Edit Post Modal */
+.edit-post-modal {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    padding: 2rem;
+}
+
+.edit-post-modal h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}

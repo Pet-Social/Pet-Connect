@@ -34,31 +34,6 @@ const authIcon = document.getElementById("auth-icon");
 const postLoginPrompt = document.getElementById("postLoginPrompt");
 const promptLoginBtn = document.getElementById("promptLoginBtn");
 
-// Test images for demo posts
-const testImages = [
-    "./assets/imagesfortest/anotherMoment.jpeg",
-    "./assets/imagesfortest/BestMoment.jpeg",
-    "./assets/imagesfortest/GoodBoy.jpeg",
-    "./assets/imagesfortest/MyPet&MyChild.jpg",
-    "./assets/imagesfortest/NatureWithMyPet.webp",
-];
-
-const randomNames = ["Alex", "Sam", "Lina", "Yassine", "Nour", "Karim", "Sophie", "Leo", "Maya", "Adam"];
-const randomDescriptions = [
-    "Regardez mon animal mignon !",
-    "Moment adorable de la journée.",
-    "Il fait une sieste paisible.",
-    "Un moment drôle capturé !",
-    "Journée ensoleillée pour mon ami."
-];
-
-function randomDate() {
-    const today = new Date();
-    const past = new Date();
-    past.setDate(today.getDate() - Math.floor(Math.random() * 30));
-    return past.toLocaleDateString() + " " + past.toLocaleTimeString();
-}
-
 function toggleForm() {
     if (!currentUser) {
         pendingPostAction = true;
@@ -167,6 +142,10 @@ async function updateUIForLoggedInUser(user, fromPostButton = false) {
     } else if (currentProfile) {
         openProfileModal();
     }
+    
+    if (currentFilter === 'my') {
+        loadPosts();
+    }
 }
 
 async function logout() {
@@ -238,6 +217,19 @@ loginForm.addEventListener("submit", async (e) => {
     if (error) {
         alert("Erreur de connexion : " + error.message);
         return;
+    }
+
+    const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+    
+    if (!profile) {
+        const username = data.user.user_metadata?.full_name || email.split('@')[0];
+        await supabaseClient
+            .from('profiles')
+            .insert([{ id: data.user.id, username: username }]);
     }
 
     localStorage.setItem('justLoggedIn', 'true');
@@ -374,26 +366,135 @@ postImageInput.addEventListener("change", (e) => {
     }
 });
 
+// Filter buttons
+let currentFilter = 'all';
+const filterAllBtn = document.getElementById("filterAll");
+const filterMyBtn = document.getElementById("filterMy");
+
+filterAllBtn.addEventListener("click", () => {
+    currentFilter = 'all';
+    filterAllBtn.classList.add("active");
+    filterMyBtn.classList.remove("active");
+    loadPosts();
+});
+
+filterMyBtn.addEventListener("click", () => {
+    if (!currentUser) {
+        openAuthModal();
+        return;
+    }
+    currentFilter = 'my';
+    filterMyBtn.classList.add("active");
+    filterAllBtn.classList.remove("active");
+    loadPosts();
+});
+
+// Edit Post Modal
+const editPostModal = document.getElementById("editPostModal");
+const editPostForm = document.getElementById("editPostForm");
+const editPostCaption = document.getElementById("editPostCaption");
+const closeEditPostBtn = document.getElementById("closeEditPostModal");
+const deletePostBtn = document.getElementById("deletePostBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+let editingPostId = null;
+
+function openEditPostModal(post) {
+    editingPostId = post.id;
+    editPostCaption.value = post.caption || "";
+    editPostModal.classList.remove("hidden");
+}
+
+function closeEditPostModal() {
+    editPostModal.classList.add("hidden");
+    editingPostId = null;
+}
+
+closeEditPostBtn.addEventListener("click", closeEditPostModal);
+cancelEditBtn.addEventListener("click", closeEditPostModal);
+
+window.addEventListener("click", (e) => {
+    if (e.target === editPostModal) {
+        closeEditPostModal();
+    }
+});
+
+editPostForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newCaption = editPostCaption.value;
+    
+    const { error } = await supabaseClient
+        .from('posts')
+        .update({ caption: newCaption })
+        .eq('id', editingPostId);
+    
+    if (error) {
+        alert("Erreur lors de la modification: " + error.message);
+        return;
+    }
+    
+    closeEditPostModal();
+    loadPosts();
+});
+
+deletePostBtn.addEventListener("click", async () => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce post ?")) return;
+    
+    const { data: post } = await supabaseClient
+        .from('posts')
+        .select('image_url')
+        .eq('id', editingPostId)
+        .single();
+    
+    if (post?.image_url) {
+        const filePath = post.image_url.split('/post-images/')[1];
+        if (filePath) {
+            await supabaseClient.storage
+                .from('post-images')
+                .remove([filePath]);
+        }
+    }
+    
+    const { error } = await supabaseClient
+        .from('posts')
+        .delete()
+        .eq('id', editingPostId);
+    
+    if (error) {
+        alert("Erreur lors de la suppression: " + error.message);
+        return;
+    }
+    
+    closeEditPostModal();
+    loadPosts();
+});
+
 // Load Posts
 async function loadPosts() {
     postsContainer.innerHTML = "<p style='text-align:center;color:var(--text-muted);'>Chargement des posts...</p>";
     
-    const { data: posts, error } = await supabaseClient
+    let query = supabaseClient
         .from('posts')
         .select(`
             *,
             profiles:user_id (username)
         `)
         .order('created_at', { ascending: false });
+    
+    if (currentFilter === 'my' && currentUser) {
+        query = query.eq('user_id', currentUser.id);
+    }
+    
+    const { data: posts, error } = await query;
 
     if (error) {
         console.error('Error loading posts:', error);
-        loadTestPosts();
+        postsContainer.innerHTML = "<p style='text-align:center;color:var(--text-muted);'>Erreur lors du chargement des posts.</p>";
         return;
     }
 
     if (!posts || posts.length === 0) {
-        loadTestPosts();
+        postsContainer.innerHTML = "<p style='text-align:center;color:var(--text-muted);'>Aucun post disponible.</p>";
         return;
     }
 
@@ -401,15 +502,67 @@ async function loadPosts() {
     posts.forEach(post => {
         const postEl = document.createElement("div");
         postEl.classList.add("post-card");
+        
+        const isOwner = currentUser && currentUser.id === post.user_id;
+        const actionsHtml = isOwner ? `
+            <div class="post-owner-actions">
+                <button class="post-edit-btn" data-id="${post.id}" data-caption="${post.caption || ''}">Modifier</button>
+                <button class="post-delete-btn" data-id="${post.id}">Supprimer</button>
+            </div>
+        ` : '';
+        
         postEl.innerHTML = `
             <div class="post-header">
                 <span class="post-owner">${post.profiles?.username || 'Utilisateur'}</span>
+                ${actionsHtml}
                 <div class="post-date">${new Date(post.created_at).toLocaleDateString()} ${new Date(post.created_at).toLocaleTimeString()}</div>
             </div>
             <img src="${post.image_url}" class="post-image" alt="Post image" />
             <div class="post-caption">${post.caption || ''}</div>
         `;
         postsContainer.appendChild(postEl);
+    });
+    
+    document.querySelectorAll('.post-edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const postId = e.target.dataset.id;
+            const caption = e.target.dataset.caption;
+            openEditPostModal({ id: postId, caption });
+        });
+    });
+    
+    document.querySelectorAll('.post-delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const postId = e.target.dataset.id;
+            if (!confirm("Êtes-vous sûr de vouloir supprimer ce post ?")) return;
+            
+            const { data: post } = await supabaseClient
+                .from('posts')
+                .select('image_url')
+                .eq('id', postId)
+                .single();
+            
+            if (post?.image_url) {
+                const filePath = post.image_url.split('/post-images/')[1];
+                if (filePath) {
+                    await supabaseClient.storage
+                        .from('post-images')
+                        .remove([filePath]);
+                }
+            }
+            
+            const { error } = await supabaseClient
+                .from('posts')
+                .delete()
+                .eq('id', postId);
+            
+            if (error) {
+                alert("Erreur lors de la suppression: " + error.message);
+                return;
+            }
+            
+            loadPosts();
+        });
     });
 }
 
@@ -441,6 +594,15 @@ postForm.addEventListener("submit", async (e) => {
     if (!currentUser) {
         openAuthModal();
         return;
+    }
+
+    if (!currentProfile) {
+        const username = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+        currentProfile = await createProfile(currentUser.id, username);
+        if (!currentProfile) {
+            alert("Erreur: Impossible de créer votre profil. Veuillez vous déconnecter et vous reconnecter.");
+            return;
+        }
     }
 
     const imageFile = document.getElementById("postImage").files[0];
@@ -517,6 +679,10 @@ async function checkUserSession() {
             postSection.classList.remove("hidden");
             toggleBtn.classList.add("hidden");
             postsContainer.classList.add("hidden");
+        }
+        
+        if (currentFilter === 'my') {
+            loadPosts();
         }
     }
     loadPosts();

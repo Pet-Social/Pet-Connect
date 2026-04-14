@@ -42,7 +42,10 @@
             <button class="submit-btn" id="togglePostBtn" style="margin: 0 auto">
                 <span>📸 Partagez un moment avec votre animal</span>
             </button>
-            <br>
+            <div class="posts-filter">
+                <button class="filter-btn active" id="filterAll">Tous les posts</button>
+                <button class="filter-btn" id="filterMy">Mes posts</button>
+            </div>
             <section id="postsContainer" class="container"></section>
         </div>
         <section id="postSection" class="card hidden">
@@ -174,6 +177,25 @@
             <div class="profile-actions">
                 <button id="logoutBtn" class="btn btn-secondary w-100">Déconnexion</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit Post Modal -->
+    <div id="editPostModal" class="modal-overlay hidden">
+        <div class="edit-post-modal card">
+            <button class="close-modal" id="closeEditPostModal">&times;</button>
+            <h2>Modifier le post</h2>
+            <form id="editPostForm">
+                <div class="form-group">
+                    <label for="editPostCaption">Légende</label>
+                    <textarea id="editPostCaption" class="form-control" placeholder="Que fait votre animal ?"></textarea>
+                </div>
+                <div class="post-actions">
+                    <button type="submit" class="btn">Enregistrer</button>
+                    <button type="button" id="deletePostBtn" class="btn btn-danger">Supprimer</button>
+                    <button type="button" id="cancelEditBtn" class="btn btn-secondary">Annuler</button>
+                </div>
+            </form>
         </div>
     </div>
 
