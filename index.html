@@ -154,8 +154,20 @@
             </div>
             <form id="profileForm" class="profile-form">
                 <div class="form-group">
+                    <label for="profileUsername">Nom d'utilisateur</label>
+                    <input type="text" id="profileUsernameInput" class="form-control" placeholder="Votre nom">
+                </div>
+                <div class="form-group">
+                    <label for="profileEmail">Email</label>
+                    <input type="email" id="profileEmailInput" class="form-control" placeholder="votre@email.com">
+                </div>
+                <div class="form-group">
                     <label for="profilePhone">Téléphone</label>
                     <input type="tel" id="profilePhone" class="form-control" placeholder="06 12 34 56 78">
+                </div>
+                <div class="form-group">
+                    <label for="profilePassword">Nouveau mot de passe</label>
+                    <input type="password" id="profilePassword" class="form-control" placeholder="Laisser vide pour ne pas changer">
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Mettre à jour</button>
             </form>

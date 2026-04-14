@@ -282,6 +282,9 @@ const profileAvatar = document.getElementById("profileAvatar");
 const profileUsername = document.getElementById("profileUsername");
 const profileEmail = document.getElementById("profileEmail");
 const profilePhone = document.getElementById("profilePhone");
+const profileUsernameInput = document.getElementById("profileUsernameInput");
+const profileEmailInput = document.getElementById("profileEmailInput");
+const profilePasswordInput = document.getElementById("profilePassword");
 const logoutBtn = document.getElementById("logoutBtn");
 
 function openProfileModal() {
@@ -291,7 +294,10 @@ function openProfileModal() {
     profileAvatar.textContent = getInitials(username);
     profileUsername.textContent = username;
     profileEmail.textContent = currentUser.email;
+    profileUsernameInput.value = username;
+    profileEmailInput.value = currentUser.email;
     profilePhone.value = currentProfile?.phone || currentUser.user_metadata?.phone || "";
+    profilePasswordInput.value = "";
     
     profileModal.classList.remove("hidden");
 }
@@ -310,14 +316,47 @@ window.addEventListener("click", (e) => {
 
 profileForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const phone = profilePhone.value;
     
-    const updatedProfile = await updateProfile(currentUser.id, { phone });
-    if (updatedProfile) {
-        currentProfile = updatedProfile;
-        alert("Profil mis à jour !");
-    } else {
-        alert("Erreur lors de la mise à jour du profil.");
+    const newUsername = profileUsernameInput.value.trim();
+    const newEmail = profileEmailInput.value.trim();
+    const newPhone = profilePhone.value.trim();
+    const newPassword = profilePasswordInput.value;
+    
+    const btn = profileForm.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = "Mise à jour...";
+    
+    try {
+        if (newEmail !== currentUser.email) {
+            const { error: emailError } = await supabaseClient.auth.updateUser({
+                email: newEmail
+            });
+            if (emailError) throw emailError;
+        }
+        
+        if (newPassword) {
+            const { error: passwordError } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+            if (passwordError) throw passwordError;
+        }
+        
+        const { error: profileError } = await supabaseClient
+            .from('profiles')
+            .update({ username: newUsername, phone: newPhone })
+            .eq('id', currentUser.id);
+        
+        if (profileError) {
+            console.error('Profile update error:', profileError);
+        }
+        
+        alert("Profil mis à jour avec succès !");
+        location.reload();
+        
+    } catch (error) {
+        alert("Erreur: " + error.message);
+        btn.disabled = false;
+        btn.textContent = "Mettre à jour";
     }
 });
 
