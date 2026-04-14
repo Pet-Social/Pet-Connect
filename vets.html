@@ -1,78 +1,130 @@
 <!doctype html>
 <html lang="fr">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pet Connect</title>
-    <meta name="description"
-        content="Une application sociale ouverte pour animaux de compagnie : offrant un espace aux utilisateurs pour partager leurs moments spéciaux, en apprendre plus sur leurs animaux et un espace pour l'adoption d'animaux. " />
-    <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
-
-    <link rel="stylesheet" href="./styles.css" />
-
-    <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
-
-    <!-- Preconnect to external domains-->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-</head>
-
-<body>
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vétérinaires – Pet Connect</title>
+    <meta name="description" content="Trouvez des vétérinaires locaux pour vos animaux de compagnie."/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="./styles.css"/>
+    <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  </head>
+  <body>
     <header>
-        <div class="container navbar">
-            <a href="index.html" class="logo">🐾 Pet Connect</a>
-            <nav class="nav-links">
-                <a href="index.html">Accueil</a>
-                <a href="adoption.html">Adoption</a>
-                <a href="shop.html">Boutique</a>
-                <a href="vets.html" class="active">Vétérinaires</a>
-                <a href="tips.html">Conseils</a>
-                <button id="theme-toggle" class="theme-toggle-btn" title="Changer le thème">
-                    <span id="theme-icon">🌙</span>
-                </button>
-            </nav>
-        </div>
+      <div class="container navbar">
+        <a href="index.html" class="logo">🐾 Pet Connect</a>
+        <nav class="nav-links">
+          <a href="index.html">Accueil</a>
+          <a href="adoption.html">Adoption</a>
+          <a href="shop.html">Boutique</a>
+          <a href="vets.html" class="active">Vétérinaires</a>
+          <a href="tips.html">Conseils</a>
+          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Changer le thème" title="Changer le thème">
+            <span id="theme-icon">🌙</span>
+          </button>
+        </nav>
+      </div>
     </header>
 
     <main class="container">
-        <!--Placez votre code ici-->
+      <h1 class="text-center mb-4">Vétérinaires à proximité</h1>
+
+      <input class="form-control mb-4" type="text" id="search" placeholder="Rechercher un vétérinaire..." aria-label="Rechercher un vétérinaire"/>
+
+      <div class="grid-container" id="vet-grid">
+
+        <article class="card vet-card" data-name="animacare wissem ketata teniour">
+          <h3>Clinique AnimaCare</h3>
+          <p>Route de Teniour, 1.5 km du centre-ville, Sfax</p>
+          <p class="vet-meta">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.7</p>
+          <p class="vet-meta">Lun–Sam : 9h–19h</p>
+          <div class="vet-contact">
+            <p><strong>Tél :</strong> <a href="tel:+21695080695" onclick="showToast('Appel en cours...')">+216 95 080 695</a></p>
+            <p><a href="https://www.google.com/maps/search/Clinique+Vétérinaire+AnimaCare+Sfax" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
+          </div>
+        </article>
+
+        <article class="card vet-card" data-name="louati zouhir sfax sud aeroport">
+          <h3>Dr. Zouhir Louati</h3>
+          <p>Route de l'Aéroport KM 0.5, Sfax Sud 3083</p>
+          <p class="vet-meta">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.5</p>
+          <p class="vet-meta">Lun–Ven : 8h–18h &nbsp;|&nbsp; Sam : 8h–13h</p>
+          <div class="vet-contact">
+            <p><strong>Tél :</strong> <a href="tel:+21674000000" onclick="showToast('Appel en cours...')">+216 74 000 000</a></p>
+            <p><a href="https://www.google.com/maps/search/Dr+Louati+Zouhir+vétérinaire+Sfax+Sud" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
+          </div>
+        </article>
+
+        <article class="card vet-card" data-name="clinique amal route mahdia sfax">
+          <h3>Clinique Vétérinaire Amal</h3>
+          <p>Route de Mahdia KM 9, Sfax</p>
+          <p class="vet-meta">🐇 Tous animaux &nbsp;|&nbsp; ⭐ 4.8</p>
+          <p class="vet-meta">Lun–Sam : 9h–20h</p>
+          <div class="vet-contact">
+            <p><strong>Tél :</strong> <a href="tel:+21674000001" onclick="showToast('Appel en cours...')">+216 74 000 001</a></p>
+            <p><a href="https://www.google.com/maps/search/Clinique+Vétérinaire+Amal+Route+Mahdia+Sfax" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
+          </div>
+        </article>
+
+      </div>
+
+      <p class="hidden text-center" id="no-results">
+        Aucun vétérinaire trouvé pour cette recherche.
+      </p>
     </main>
 
+    <div class="vet-toast" id="toast"></div>
+
     <footer>
-        <p>© 2026 L2 INFO ISIMM.</p>
+      <p>© 2026 L2 INFO ISIMM.</p>
     </footer>
 
-</body>
-<script>
-    // Fonction de basculement du thème
-    function setupThemeToggle() {
-        const themeToggle = document.getElementById("theme-toggle");
-        const themeIcon = document.getElementById("theme-icon");
-
-        // Vérifier la préférence de thème enregistrée ou par défaut sur sombre
-        const savedTheme = localStorage.getItem("theme") || "dark";
-        document.documentElement.setAttribute("data-theme", savedTheme);
+    <script>
+      function setupThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
-
-        themeToggle.addEventListener("click", () => {
-            const currentTheme =
-                document.documentElement.getAttribute("data-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-            document.documentElement.setAttribute(
-                "data-theme",
-                newTheme,
-            );
-            localStorage.setItem("theme", newTheme);
-            updateThemeIcon(newTheme);
+        themeToggle.addEventListener('click', () => {
+          const current = document.documentElement.getAttribute('data-theme');
+          const next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+          updateThemeIcon(next);
         });
-
         function updateThemeIcon(theme) {
-            themeIcon.textContent = theme === "dark" ? "🌙" : "☀️";
+          themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
         }
-    }
-    setupThemeToggle();
-</script>
+      }
 
+      function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('vet-toast--visible');
+        setTimeout(() => toast.classList.remove('vet-toast--visible'), 2500);
+      }
+
+      function setupSearch() {
+        const input = document.getElementById('search');
+        const cards = document.querySelectorAll('.vet-card');
+        const noResults = document.getElementById('no-results');
+        input.addEventListener('input', () => {
+          const query = input.value.toLowerCase().trim();
+          let visible = 0;
+          cards.forEach(card => {
+            const match = card.textContent.toLowerCase().includes(query) || card.dataset.name.includes(query);
+            card.style.display = match ? '' : 'none';
+            if (match) visible++;
+          });
+          noResults.classList.toggle('hidden', visible > 0);
+        });
+      }
+
+      setupThemeToggle();
+      setupSearch();
+    </script>
+  </body>
 </html>
