@@ -1,699 +1,430 @@
 import { supabaseUrl, supabaseKey } from './config.js';
 
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
+let supabaseClient = null;
 let currentUser = null;
 let currentProfile = null;
 
-// Theme changing
-function setupThemeToggle() {
-    const themeToggle = document.getElementById("theme-toggle");
-    const themeIcon = document.getElementById("theme-icon");
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    document.documentElement.setAttribute("data-theme", savedTheme);
-    themeIcon.textContent = savedTheme === "dark" ? "🌙" : "☀️";
-
-    themeToggle.addEventListener("click", () => {
-        const currentTheme = document.documentElement.getAttribute("data-theme");
-        const newTheme = currentTheme === "dark" ? "light" : "dark";
-        document.documentElement.setAttribute("data-theme", newTheme);
-        themeIcon.textContent = newTheme === "dark" ? "🌙" : "☀️";
-        localStorage.setItem("theme", newTheme);
-    });
-}
-setupThemeToggle();
-
-// Elements
-const postForm = document.getElementById("postForm");
-const postSection = document.getElementById("postSection");
-const toggleBtn = document.getElementById("togglePostBtn");
-const cancelBtn = document.getElementById("cancelPostBtn");
-const postsContainer = document.getElementById("postsContainer");
-const authBtn = document.getElementById("auth-btn");
-const authIcon = document.getElementById("auth-icon");
-const postLoginPrompt = document.getElementById("postLoginPrompt");
-const promptLoginBtn = document.getElementById("promptLoginBtn");
-
-function toggleForm() {
-    if (!currentUser) {
-        pendingPostAction = true;
-        openAuthModal();
-        return;
-    }
-    const isHidden = postSection.classList.contains("hidden");
-    if (isHidden) {
-        postSection.classList.remove("hidden");
-        toggleBtn.classList.add("hidden");
-        postsContainer.classList.add("hidden");
-    } else {
-        postSection.classList.add("hidden");
-        toggleBtn.classList.remove("hidden");
-        postsContainer.classList.remove("hidden");
-    }
-}
-
-toggleBtn.addEventListener("click", toggleForm);
-cancelBtn.addEventListener("click", toggleForm);
-
-function getInitials(username) {
-    if (!username) return "U";
-    const parts = username.trim().split(/\s+/);
-    if (parts.length >= 2) {
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return username.slice(0, 2).toUpperCase();
-}
-
-function updateAuthButton(user, profile) {
-    if (user) {
-        const username = profile?.username || user.user_metadata?.full_name || user.email;
-        authBtn.innerHTML = `<div class="user-avatar">${getInitials(username)}</div>`;
-        authBtn.title = username;
-    } else {
-        authBtn.innerHTML = `<img src="assets/images/signUp/android-chrome-192x192.png" class="loginIcon" id="auth-icon" alt="Se connecter" />`;
-        authBtn.title = "Se connecter";
-    }
-}
-
-function updatePostFormState() {
-    if (currentUser) {
-        postLoginPrompt.classList.add("hidden");
-    } else {
-        postLoginPrompt.classList.remove("hidden");
-    }
-}
-
-async function loadProfile(userId) {
-    const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+function initApp() {
+    console.log('Pet Connect initializing...');
     
-    if (error && error.code !== 'PGRST116') {
-        console.error('Error loading profile:', error);
-    }
-    return data || null;
-}
-
-async function createProfile(userId, username, phone = null) {
-    const { data, error } = await supabaseClient
-        .from('profiles')
-        .insert([{ id: userId, username, phone }])
-        .select()
-        .single();
-    
-    if (error) {
-        console.error('Error creating profile:', error);
-        return null;
-    }
-    return data;
-}
-
-async function updateProfile(userId, updates) {
-    const { data, error } = await supabaseClient
-        .from('profiles')
-        .update(updates)
-        .eq('id', userId)
-        .select()
-        .single();
-    
-    if (error) {
-        console.error('Error updating profile:', error);
-        return null;
-    }
-    return data;
-}
-
-let pendingPostAction = false;
-
-async function updateUIForLoggedInUser(user, fromPostButton = false) {
-    currentUser = user;
-    currentProfile = await loadProfile(user.id);
-    
-    updateAuthButton(user, currentProfile);
-    updatePostFormState();
-    
-    if (fromPostButton) {
-        postSection.classList.remove("hidden");
-        toggleBtn.classList.add("hidden");
-        postsContainer.classList.add("hidden");
-        postSection.scrollIntoView({ behavior: 'smooth' });
-    } else if (currentProfile) {
-        openProfileModal();
-    }
-    
-    if (currentFilter === 'my') {
-        loadPosts();
-    }
-}
-
-async function logout() {
-    await supabaseClient.auth.signOut();
-    localStorage.removeItem('justLoggedIn');
-    location.reload();
-}
-
-// Auth Modal
-const authModal = document.getElementById("authModal");
-const closeAuthBtn = document.getElementById("closeAuthModal");
-const loginTab = document.getElementById("loginTab");
-const signupTab = document.getElementById("signupTab");
-const loginForm = document.getElementById("loginForm");
-const signupForm = document.getElementById("signupForm");
-
-function openAuthModal() {
-    authModal.classList.remove("hidden");
-}
-
-function closeAuthModal() {
-    authModal.classList.add("hidden");
-    loginForm.reset();
-    signupForm.reset();
-}
-
-authBtn.addEventListener("click", () => {
-    if (currentUser) {
-        openProfileModal();
-    } else {
-        openAuthModal();
-    }
-});
-
-promptLoginBtn.addEventListener("click", openAuthModal);
-
-closeAuthBtn.addEventListener("click", closeAuthModal);
-
-window.addEventListener("click", (e) => {
-    if (e.target === authModal) {
-        closeAuthModal();
-    }
-});
-
-loginTab.addEventListener("click", () => {
-    loginTab.classList.add("active");
-    signupTab.classList.remove("active");
-    loginForm.classList.remove("hidden");
-    signupForm.classList.add("hidden");
-});
-
-signupTab.addEventListener("click", () => {
-    signupTab.classList.add("active");
-    loginTab.classList.remove("active");
-    signupForm.classList.remove("hidden");
-    loginForm.classList.add("hidden");
-});
-
-loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        alert("Erreur de connexion : " + error.message);
-        return;
-    }
-
-    const { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-    
-    if (!profile) {
-        const username = data.user.user_metadata?.full_name || email.split('@')[0];
-        await supabaseClient
-            .from('profiles')
-            .insert([{ id: data.user.id, username: username }]);
-    }
-
-    localStorage.setItem('justLoggedIn', 'true');
-    location.reload();
-});
-
-signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("signupName").value;
-    const phone = document.getElementById("signupPhone").value;
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-
-    const { data, error } = await supabaseClient.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-            data: {
-                full_name: name,
-            }
-        }
-    });
-
-    if (error) {
-        alert("Erreur d'inscription : " + error.message);
-        return;
-    }
-
-    if (data.user) {
-        await createProfile(data.user.id, name, phone);
-    }
-
-    localStorage.setItem('justLoggedIn', 'true');
-    location.reload();
-});
-
-// Profile Modal
-const profileModal = document.getElementById("profileModal");
-const closeProfileBtn = document.getElementById("closeProfileModal");
-const profileForm = document.getElementById("profileForm");
-const profileAvatar = document.getElementById("profileAvatar");
-const profileUsername = document.getElementById("profileUsername");
-const profileEmail = document.getElementById("profileEmail");
-const profilePhone = document.getElementById("profilePhone");
-const profileUsernameInput = document.getElementById("profileUsernameInput");
-const profileEmailInput = document.getElementById("profileEmailInput");
-const profilePasswordInput = document.getElementById("profilePassword");
-const logoutBtn = document.getElementById("logoutBtn");
-
-function openProfileModal() {
-    if (!currentUser) return;
-    
-    const username = currentProfile?.username || currentUser.user_metadata?.full_name || "Utilisateur";
-    profileAvatar.textContent = getInitials(username);
-    profileUsername.textContent = username;
-    profileEmail.textContent = currentUser.email;
-    profileUsernameInput.value = username;
-    profileEmailInput.value = currentUser.email;
-    profilePhone.value = currentProfile?.phone || currentUser.user_metadata?.phone || "";
-    profilePasswordInput.value = "";
-    
-    profileModal.classList.remove("hidden");
-}
-
-function closeProfileModal() {
-    profileModal.classList.add("hidden");
-}
-
-closeProfileBtn.addEventListener("click", closeProfileModal);
-
-window.addEventListener("click", (e) => {
-    if (e.target === profileModal) {
-        closeProfileModal();
-    }
-});
-
-profileForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    
-    const newUsername = profileUsernameInput.value.trim();
-    const newEmail = profileEmailInput.value.trim();
-    const newPhone = profilePhone.value.trim();
-    const newPassword = profilePasswordInput.value;
-    
-    const btn = profileForm.querySelector('button[type="submit"]');
-    btn.disabled = true;
-    btn.textContent = "Mise à jour...";
-    
-    try {
-        if (newEmail !== currentUser.email) {
-            const { error: emailError } = await supabaseClient.auth.updateUser({
-                email: newEmail
-            });
-            if (emailError) throw emailError;
-        }
-        
-        if (newPassword) {
-            const { error: passwordError } = await supabaseClient.auth.updateUser({
-                password: newPassword
-            });
-            if (passwordError) throw passwordError;
-        }
-        
-        const { error: profileError } = await supabaseClient
-            .from('profiles')
-            .update({ username: newUsername, phone: newPhone })
-            .eq('id', currentUser.id);
-        
-        if (profileError) {
-            console.error('Profile update error:', profileError);
-        }
-        
-        alert("Profil mis à jour avec succès !");
-        location.reload();
-        
-    } catch (error) {
-        alert("Erreur: " + error.message);
-        btn.disabled = false;
-        btn.textContent = "Mettre à jour";
-    }
-});
-
-logoutBtn.addEventListener("click", logout);
-
-// Post Image Preview
-const postImageInput = document.getElementById("postImage");
-const imageStatusText = document.getElementById("imageStatusText");
-
-postImageInput.addEventListener("change", (e) => {
-    if (e.target.files.length > 0) {
-        imageStatusText.textContent = e.target.files[0].name;
-    } else {
-        imageStatusText.textContent = "Sélectionnez votre image";
-    }
-});
-
-// Filter buttons
-let currentFilter = 'all';
-const filterAllBtn = document.getElementById("filterAll");
-const filterMyBtn = document.getElementById("filterMy");
-
-filterAllBtn.addEventListener("click", () => {
-    currentFilter = 'all';
-    filterAllBtn.classList.add("active");
-    filterMyBtn.classList.remove("active");
-    loadPosts();
-});
-
-filterMyBtn.addEventListener("click", () => {
-    if (!currentUser) {
-        openAuthModal();
-        return;
-    }
-    currentFilter = 'my';
-    filterMyBtn.classList.add("active");
-    filterAllBtn.classList.remove("active");
-    loadPosts();
-});
-
-// Edit Post Modal
-const editPostModal = document.getElementById("editPostModal");
-const editPostForm = document.getElementById("editPostForm");
-const editPostCaption = document.getElementById("editPostCaption");
-const closeEditPostBtn = document.getElementById("closeEditPostModal");
-const deletePostBtn = document.getElementById("deletePostBtn");
-const cancelEditBtn = document.getElementById("cancelEditBtn");
-
-let editingPostId = null;
-
-function openEditPostModal(post) {
-    editingPostId = post.id;
-    editPostCaption.value = post.caption || "";
-    editPostModal.classList.remove("hidden");
-}
-
-function closeEditPostModal() {
-    editPostModal.classList.add("hidden");
-    editingPostId = null;
-}
-
-closeEditPostBtn.addEventListener("click", closeEditPostModal);
-cancelEditBtn.addEventListener("click", closeEditPostModal);
-
-window.addEventListener("click", (e) => {
-    if (e.target === editPostModal) {
-        closeEditPostModal();
-    }
-});
-
-editPostForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const newCaption = editPostCaption.value;
-    
-    const { error } = await supabaseClient
-        .from('posts')
-        .update({ caption: newCaption })
-        .eq('id', editingPostId);
-    
-    if (error) {
-        alert("Erreur lors de la modification: " + error.message);
+    // Initialize Supabase
+    if (!window.supabase) {
+        console.error('Supabase library not loaded!');
         return;
     }
     
-    closeEditPostModal();
-    loadPosts();
-});
-
-deletePostBtn.addEventListener("click", async () => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce post ?")) return;
+    supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    console.log('Supabase initialized');
     
-    const { data: post } = await supabaseClient
-        .from('posts')
-        .select('image_url')
-        .eq('id', editingPostId)
-        .single();
+    // Get DOM elements
+    const authBtn = document.getElementById('auth-btn');
+    const authModal = document.getElementById('authModal');
+    const closeAuthBtn = document.getElementById('closeAuthModal');
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const profileModal = document.getElementById('profileModal');
+    const closeProfileBtn = document.getElementById('closeProfileModal');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const themeToggle = document.getElementById('theme-toggle');
     
-    if (post?.image_url) {
-        const filePath = post.image_url.split('/post-images/')[1];
-        if (filePath) {
-            await supabaseClient.storage
-                .from('post-images')
-                .remove([filePath]);
-        }
+    // Theme setup
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+        themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
     }
     
-    const { error } = await supabaseClient
-        .from('posts')
-        .delete()
-        .eq('id', editingPostId);
-    
-    if (error) {
-        alert("Erreur lors de la suppression: " + error.message);
-        return;
-    }
-    
-    closeEditPostModal();
-    loadPosts();
-});
-
-// Load Posts
-async function loadPosts() {
-    postsContainer.innerHTML = "<p style='text-align:center;color:var(--text-muted);'>Chargement des posts...</p>";
-    
-    let query = supabaseClient
-        .from('posts')
-        .select(`
-            *,
-            profiles:user_id (username)
-        `)
-        .order('created_at', { ascending: false });
-    
-    if (currentFilter === 'my' && currentUser) {
-        query = query.eq('user_id', currentUser.id);
-    }
-    
-    const { data: posts, error } = await query;
-
-    if (error) {
-        console.error('Error loading posts:', error);
-        postsContainer.innerHTML = "<p style='text-align:center;color:var(--text-muted);'>Erreur lors du chargement des posts.</p>";
-        return;
-    }
-
-    if (!posts || posts.length === 0) {
-        postsContainer.innerHTML = "<p style='text-align:center;color:var(--text-muted);'>Aucun post disponible.</p>";
-        return;
-    }
-
-    postsContainer.innerHTML = "";
-    posts.forEach(post => {
-        const postEl = document.createElement("div");
-        postEl.classList.add("post-card");
-        
-        const isOwner = currentUser && currentUser.id === post.user_id;
-        const actionsHtml = isOwner ? `
-            <div class="post-owner-actions">
-                <button class="post-edit-btn" data-id="${post.id}" data-caption="${post.caption || ''}">Modifier</button>
-                <button class="post-delete-btn" data-id="${post.id}">Supprimer</button>
-            </div>
-        ` : '';
-        
-        postEl.innerHTML = `
-            <div class="post-header">
-                <span class="post-owner">${post.profiles?.username || 'Utilisateur'}</span>
-                ${actionsHtml}
-                <div class="post-date">${new Date(post.created_at).toLocaleDateString()} ${new Date(post.created_at).toLocaleTimeString()}</div>
-            </div>
-            <img src="${post.image_url}" class="post-image" alt="Post image" />
-            <div class="post-caption">${post.caption || ''}</div>
-        `;
-        postsContainer.appendChild(postEl);
-    });
-    
-    document.querySelectorAll('.post-edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const postId = e.target.dataset.id;
-            const caption = e.target.dataset.caption;
-            openEditPostModal({ id: postId, caption });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('theme', newTheme);
         });
-    });
+    }
     
-    document.querySelectorAll('.post-delete-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const postId = e.target.dataset.id;
-            if (!confirm("Êtes-vous sûr de vouloir supprimer ce post ?")) return;
-            
-            const { data: post } = await supabaseClient
-                .from('posts')
-                .select('image_url')
-                .eq('id', postId)
-                .single();
-            
-            if (post?.image_url) {
-                const filePath = post.image_url.split('/post-images/')[1];
-                if (filePath) {
-                    await supabaseClient.storage
-                        .from('post-images')
-                        .remove([filePath]);
-                }
+    // Auth button handler
+    if (authBtn) {
+        authBtn.addEventListener('click', async () => {
+            console.log('Auth button clicked');
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                currentProfile = await loadProfile(session.user.id);
+                updateAuthButton(session.user, currentProfile);
+                openProfileModal();
+            } else {
+                openAuthModal();
             }
-            
-            const { error } = await supabaseClient
-                .from('posts')
-                .delete()
-                .eq('id', postId);
-            
-            if (error) {
-                alert("Erreur lors de la suppression: " + error.message);
-                return;
-            }
-            
-            loadPosts();
         });
-    });
-}
-
-function loadTestPosts() {
-    postsContainer.innerHTML = "";
-    testImages.forEach(imgPath => {
-        const owner = randomNames[Math.floor(Math.random() * randomNames.length)];
-        const caption = randomDescriptions[Math.floor(Math.random() * randomDescriptions.length)];
-        const date = randomDate();
-
-        const post = document.createElement("div");
-        post.classList.add("post-card");
-        post.innerHTML = `
-            <div class="post-header">
-                <span class="post-owner">${owner}</span>
-                <div class="post-date">${date}</div>
-            </div>
-            <img src="${imgPath}" class="post-image" />
-            <div class="post-caption">${caption}</div>
-        `;
-        postsContainer.appendChild(post);
-    });
-}
-
-// Post Form Submission
-postForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    }
     
-    if (!currentUser) {
-        openAuthModal();
-        return;
+    // Modal functions
+    function openAuthModal() {
+        if (authModal) authModal.classList.remove('hidden');
     }
-
-    if (!currentProfile) {
-        const username = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-        currentProfile = await createProfile(currentUser.id, username);
-        if (!currentProfile) {
-            alert("Erreur: Impossible de créer votre profil. Veuillez vous déconnecter et vous reconnecter.");
-            return;
-        }
-    }
-
-    const imageFile = document.getElementById("postImage").files[0];
-    const caption = document.getElementById("postCaption").value;
-
-    if (!imageFile) {
-        alert("Veuillez sélectionner une image.");
-        return;
-    }
-
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
-
-    document.getElementById("uploadStatus").textContent = "Téléchargement en cours...";
-    document.getElementById("uploadStatus").style.color = "var(--primary-color)";
-
-    const { data: uploadData, error: uploadError } = await supabaseClient.storage
-        .from('post-images')
-        .upload(fileName, imageFile);
-
-    if (uploadError) {
-        console.error('Upload error:', uploadError);
-        alert("Erreur lors du téléchargement de l'image: " + uploadError.message);
-        document.getElementById("uploadStatus").textContent = "";
-        return;
-    }
-
-    const { data: urlData } = supabaseClient.storage
-        .from('post-images')
-        .getPublicUrl(fileName);
-
-    const imageUrl = urlData.publicUrl;
-
-    const { data: postData, error: postError } = await supabaseClient
-        .from('posts')
-        .insert([{
-            user_id: currentUser.id,
-            image_url: imageUrl,
-            caption: caption
-        }])
-        .select()
-        .single();
-
-    if (postError) {
-        console.error('Post error:', postError);
-        alert("Erreur lors de la publication: " + postError.message);
-        document.getElementById("uploadStatus").textContent = "";
-        return;
-    }
-
-    document.getElementById("uploadStatus").textContent = "Posté avec succès !";
-    document.getElementById("uploadStatus").style.color = "green";
     
-    setTimeout(() => {
-        document.getElementById("uploadStatus").textContent = "";
-        postForm.reset();
-        imageStatusText.textContent = "Sélectionnez votre image";
-        toggleForm();
-        loadPosts();
-    }, 1500);
-});
-
-// Check session on page load
-async function checkUserSession() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) {
-        currentUser = session.user;
-        currentProfile = await loadProfile(session.user.id);
-        updateAuthButton(session.user, currentProfile);
-        updatePostFormState();
-        
-        if (localStorage.getItem('justLoggedIn') === 'true') {
-            localStorage.removeItem('justLoggedIn');
-            postSection.classList.remove("hidden");
-            toggleBtn.classList.add("hidden");
-            postsContainer.classList.add("hidden");
+    function closeAuthModal() {
+        if (authModal) authModal.classList.add('hidden');
+        if (loginForm) loginForm.reset();
+        if (signupForm) signupForm.reset();
+    }
+    
+    function openProfileModal() {
+        if (!currentUser) return;
+        const username = currentProfile?.username || currentUser.user_metadata?.full_name || 'Utilisateur';
+        const avatar = document.getElementById('profileAvatar');
+        const uname = document.getElementById('profileUsername');
+        const email = document.getElementById('profileEmail');
+        if (avatar) avatar.textContent = getInitials(username);
+        if (uname) uname.textContent = username;
+        if (email) email.textContent = currentUser.email;
+        if (profileModal) profileModal.classList.remove('hidden');
+    }
+    
+    function closeProfileModal() {
+        if (profileModal) profileModal.classList.add('hidden');
+    }
+    
+    function getInitials(username) {
+        if (!username) return 'U';
+        const parts = username.trim().split(/\s+/);
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
         }
-        
-        if (currentFilter === 'my') {
-            loadPosts();
+        return username.slice(0, 2).toUpperCase();
+    }
+    
+    function updateAuthButton(user, profile) {
+        currentUser = user;
+        currentProfile = profile;
+        if (!authBtn) return;
+        if (user) {
+            const username = profile?.username || user.user_metadata?.full_name || user.email;
+            authBtn.innerHTML = `<div class="user-avatar">${getInitials(username)}</div>`;
+            authBtn.title = username;
+        } else {
+            authBtn.innerHTML = `<img src="assets/images/signUp/android-chrome-192x192.png" class="loginIcon" alt="Se connecter" />`;
+            authBtn.title = 'Se connecter';
         }
     }
-    loadPosts();
-}
-
-checkUserSession();
-
-// Listen for auth state changes
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_OUT') {
+    
+    async function loadProfile(userId) {
+        const { data } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+        return data || null;
+    }
+    
+    async function createProfile(userId, username, phone = null) {
+        const { data } = await supabaseClient
+            .from('profiles')
+            .insert([{ id: userId, username, phone }])
+            .select()
+            .single();
+        return data;
+    }
+    
+    async function logout() {
+        await supabaseClient.auth.signOut();
         localStorage.removeItem('justLoggedIn');
         location.reload();
     }
-});
+    
+    // Close buttons
+    if (closeAuthBtn) closeAuthBtn.addEventListener('click', closeAuthModal);
+    if (authModal) {
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeAuthModal();
+        });
+    }
+    if (closeProfileBtn) closeProfileBtn.addEventListener('click', closeProfileModal);
+    if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) closeProfileModal();
+        });
+    }
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+    
+    // Tab switching
+    if (loginTab) {
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            if (signupTab) signupTab.classList.remove('active');
+            if (loginForm) loginForm.classList.remove('hidden');
+            if (signupForm) signupForm.classList.add('hidden');
+        });
+    }
+    if (signupTab) {
+        signupTab.addEventListener('click', () => {
+            signupTab.classList.add('active');
+            if (loginTab) loginTab.classList.remove('active');
+            if (signupForm) signupForm.classList.remove('hidden');
+            if (loginForm) loginForm.classList.add('hidden');
+        });
+    }
+    
+    // Login form
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert('Erreur de connexion: ' + error.message);
+                return;
+            }
+            
+            localStorage.setItem('justLoggedIn', 'true');
+            location.reload();
+        });
+    }
+    
+    // Signup form
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const phone = document.getElementById('signupPhone').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            const { data, error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: { data: { full_name: name } }
+            });
+            if (error) {
+                alert('Erreur d\'inscription: ' + error.message);
+                return;
+            }
+            
+            if (data.user) {
+                await createProfile(data.user.id, name, phone);
+            }
+            
+            localStorage.setItem('justLoggedIn', 'true');
+            location.reload();
+        });
+    }
+    
+    // Profile form
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('profileUsernameInput').value.trim();
+            const newEmail = document.getElementById('profileEmailInput').value.trim();
+            const newPhone = document.getElementById('profilePhone').value.trim();
+            const newPassword = document.getElementById('profilePassword').value;
+            
+            if (newEmail !== currentUser.email) {
+                await supabaseClient.auth.updateUser({ email: newEmail });
+            }
+            if (newPassword) {
+                await supabaseClient.auth.updateUser({ password: newPassword });
+            }
+            await supabaseClient
+                .from('profiles')
+                .update({ username: newUsername, phone: newPhone })
+                .eq('id', currentUser.id);
+            
+            alert('Profil mis à jour!');
+            location.reload();
+        });
+    }
+    
+    // Check session
+    checkUserSession();
+    
+    async function checkUserSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            currentProfile = await loadProfile(session.user.id);
+            updateAuthButton(session.user, currentProfile);
+            
+            // Post-specific: show post form if just logged in
+            const postSection = document.getElementById('postSection');
+            const toggleBtn = document.getElementById('togglePostBtn');
+            const postsContainer = document.getElementById('postsContainer');
+            if (localStorage.getItem('justLoggedIn') === 'true') {
+                localStorage.removeItem('justLoggedIn');
+                if (postSection && toggleBtn && postsContainer) {
+                    postSection.classList.remove('hidden');
+                    toggleBtn.classList.add('hidden');
+                    postsContainer.classList.add('hidden');
+                }
+            }
+            
+            // Load posts if on index page
+            loadPosts();
+        } else {
+            updateAuthButton(null, null);
+            loadPosts();
+        }
+    }
+    
+    // Load posts
+    async function loadPosts() {
+        const postsContainer = document.getElementById('postsContainer');
+        if (!postsContainer) return;
+        
+        postsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Chargement...</p>';
+        
+        const { data: posts, error } = await supabaseClient
+            .from('posts')
+            .select('*, profiles:user_id (username)')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            postsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Erreur de chargement</p>';
+            return;
+        }
+        
+        if (!posts || posts.length === 0) {
+            postsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Aucun post</p>';
+            return;
+        }
+        
+        postsContainer.innerHTML = '';
+        posts.forEach(post => {
+            const div = document.createElement('div');
+            div.className = 'post-card';
+            const isOwner = currentUser && currentUser.id === post.user_id;
+            div.innerHTML = `
+                <div class="post-header">
+                    <span class="post-owner">${post.profiles?.username || 'Utilisateur'}</span>
+                    ${isOwner ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">Supprimer</button></div>' : ''}
+                    <div class="post-date">${new Date(post.created_at).toLocaleDateString()}</div>
+                </div>
+                <img src="${post.image_url}" class="post-image" alt="Post" />
+                <div class="post-caption">${post.caption || ''}</div>
+            `;
+            postsContainer.appendChild(div);
+        });
+        
+        // Delete handlers
+        document.querySelectorAll('.post-delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if (!confirm('Supprimer ce post?')) return;
+                const id = e.target.dataset.id;
+                await supabaseClient.from('posts').delete().eq('id', id);
+                loadPosts();
+            });
+        });
+    }
+    
+    // Post form (index page only)
+    const postForm = document.getElementById('postForm');
+    const toggleBtn = document.getElementById('togglePostBtn');
+    const cancelBtn = document.getElementById('cancelPostBtn');
+    const postSection = document.getElementById('postSection');
+    const postsContainer = document.getElementById('postsContainer');
+    
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            if (!currentUser) {
+                openAuthModal();
+                return;
+            }
+            if (postSection) postSection.classList.remove('hidden');
+            if (toggleBtn) toggleBtn.classList.add('hidden');
+            if (postsContainer) postsContainer.classList.add('hidden');
+        });
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            if (postSection) postSection.classList.add('hidden');
+            if (toggleBtn) toggleBtn.classList.remove('hidden');
+            if (postsContainer) postsContainer.classList.remove('hidden');
+        });
+    }
+    
+    if (postForm) {
+        postForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                openAuthModal();
+                return;
+            }
+            
+            const imageFile = document.getElementById('postImage').files[0];
+            const caption = document.getElementById('postCaption').value;
+            if (!imageFile) {
+                alert('Sélectionnez une image');
+                return;
+            }
+            
+            const fileName = `${currentUser.id}/${Date.now()}.${imageFile.name.split('.').pop()}`;
+            await supabaseClient.storage.from('post-images').upload(fileName, imageFile);
+            const { data: urlData } = supabaseClient.storage.from('post-images').getPublicUrl(fileName);
+            
+            await supabaseClient.from('posts').insert([{
+                user_id: currentUser.id,
+                image_url: urlData.publicUrl,
+                caption
+            }]);
+            
+            postForm.reset();
+            if (postSection) postSection.classList.add('hidden');
+            if (toggleBtn) toggleBtn.classList.remove('hidden');
+            if (postsContainer) postsContainer.classList.remove('hidden');
+            loadPosts();
+        });
+    }
+    
+    // Filter buttons
+    const filterAllBtn = document.getElementById('filterAll');
+    const filterMyBtn = document.getElementById('filterMy');
+    let currentFilter = 'all';
+    
+    if (filterAllBtn) {
+        filterAllBtn.addEventListener('click', () => {
+            currentFilter = 'all';
+            filterAllBtn.classList.add('active');
+            if (filterMyBtn) filterMyBtn.classList.remove('active');
+            loadPosts();
+        });
+    }
+    if (filterMyBtn) {
+        filterMyBtn.addEventListener('click', () => {
+            if (!currentUser) {
+                openAuthModal();
+                return;
+            }
+            currentFilter = 'my';
+            filterMyBtn.classList.add('active');
+            if (filterAllBtn) filterAllBtn.classList.remove('active');
+            loadPosts();
+        });
+    }
+    
+    // Auth state listener
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+            updateAuthButton(session.user, null);
+        } else if (event === 'SIGNED_OUT') {
+            updateAuthButton(null, null);
+        }
+    });
+    
+    console.log('Pet Connect ready!');
+}
+
+// Start when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
