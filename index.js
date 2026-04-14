@@ -280,15 +280,20 @@ async function initApp() {
     async function loadPosts() {
         const postsContainer = document.getElementById('postsContainer');
         if (!postsContainer) return;
+        if (!supabaseClient) return;
         
         postsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Chargement...</p>';
         
-        const { data: posts, error } = await supabaseClient
-            .from('posts')
-            .select('*, profiles:user_id (username)')
-            .order('created_at', { ascending: false });
+        let query = supabaseClient.from('posts').select('*, profiles:user_id (username)');
+        
+        if (currentFilter === 'my' && currentUser) {
+            query = query.eq('user_id', currentUser.id);
+        }
+        
+        const { data: posts, error } = await query.order('created_at', { ascending: false });
         
         if (error) {
+            console.error('Error loading posts:', error);
             postsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Erreur de chargement</p>';
             return;
         }
