@@ -1,9 +1,11 @@
-html{
+html {
     height: 100%;
 }
+
 main {
     flex: 1;
 }
+
 :root {
     --primary-color: #4a90e2;
     --primary-hover: #357abd;
@@ -63,7 +65,7 @@ ul {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 1.5rem;
 }
@@ -71,7 +73,7 @@ ul {
 header {
     background: var(--header-bg);
     backdrop-filter: blur(10px);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -89,6 +91,7 @@ header {
     font-weight: 800;
     font-size: 1.5rem;
     color: var(--primary-color);
+    padding-left: 1.5rem;
 }
 
 .nav-links {
@@ -120,7 +123,7 @@ header {
 }
 
 .theme-toggle-btn:hover {
-    background: rgba(128,128,128,0.1);
+    background: rgba(128, 128, 128, 0.1);
     color: var(--primary-color);
 }
 
@@ -223,6 +226,28 @@ textarea.form-control {
     color: #fff;
 }
 
+.btn-auth {
+    margin-right: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+    background: transparent;
+}
+.btn-auth:hover {
+    margin-right: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.2s ease;
+    background: transparent;
+    background: var(--primary-hover);
+}
 .btn:hover {
     background: var(--primary-hover);
 }
@@ -231,6 +256,13 @@ textarea.form-control {
     background: transparent;
     border: 2px solid var(--border-color);
     color: var(--text-color);
+}
+
+.loginIcon {
+    width: 60px;
+    height: 40px;
+
+
 }
 
 .submit-btn {
@@ -259,9 +291,10 @@ textarea.form-control {
     background: none;
     color: #fff;
 }
+
 .post-actions .btn {
-    flex: 1 1 auto; 
-    min-width: 120px; 
+    flex: 1 1 auto;
+    min-width: 120px;
 }
 
 footer {
@@ -296,7 +329,7 @@ footer {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 15px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 .post-header {
@@ -322,6 +355,7 @@ footer {
 .hidden {
     display: none;
 }
+
 .post-card {
     background: var(--card-bg);
     border-radius: var(--radius);
@@ -383,4 +417,116 @@ footer {
         padding: 14px;
         font-size: 0.95rem;
     }
+}
+
+/* Auth Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.auth-modal {
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    padding: 2.5rem;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-modal {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.close-modal:hover {
+    color: var(--primary-color);
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.2s ease;
+    position: relative;
+}
+
+.auth-tab.active {
+    color: var(--primary-color);
+}
+
+.auth-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-color);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-form.hidden {
+    display: none;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
 }
