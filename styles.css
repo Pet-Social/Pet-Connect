@@ -823,3 +823,19 @@ footer {
   color: var(--primary-color);
   margin: 0.75rem 0;
 }
+
+.shop-search {
+  max-width: 500px;
+  margin: 0 auto 2rem;
+}
+
+.shop-search input {
+  text-align: center;
+}
+
+#no-results {
+  text-align: center;
+  color: var(--text-muted);
+  grid-column: 1 / -1;
+  padding: 2rem;
+}

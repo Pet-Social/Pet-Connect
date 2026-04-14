@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const shopGrid = document.getElementById('shopGrid');
+    const searchInput = document.getElementById('searchInput');
 
     const products = [
         {
@@ -40,16 +41,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    products.forEach(product => {
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" class="product-image" style="height: 200px; object-fit: contain; padding: 1rem; background: #f9f9f9;">
-            <h3>${product.name}</h3>
-            <p style="color: #666; font-size: 0.9rem;">${product.category}</p>
-            <div class="product-price">$${product.price.toFixed(2)}</div>
-            <button class="btn" style="width: 100%;" onclick="alert('Purchasing not available in demo')">Buy Now</button>
-        `;
-        shopGrid.appendChild(card);
+    function renderProducts(filteredProducts) {
+        shopGrid.innerHTML = '';
+        
+        if (filteredProducts.length === 0) {
+            shopGrid.innerHTML = '<p id="no-results">Aucun produit trouvé</p>';
+            return;
+        }
+
+        filteredProducts.forEach(product => {
+            const card = document.createElement('article');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" class="product-image" style="height: 200px; object-fit: contain; padding: 1rem; background: #f9f9f9;">
+                <h3>${product.name}</h3>
+                <p style="color: #666; font-size: 0.9rem;">${product.category}</p>
+                <div class="product-price">$${product.price.toFixed(2)}</div>
+                <button class="btn" style="width: 100%;" onclick="alert('Purchasing not available in demo')">Buy Now</button>
+            `;
+            shopGrid.appendChild(card);
+        });
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredProducts = products.filter(product => 
+            product.name.toLowerCase().includes(searchTerm) ||
+            product.category.toLowerCase().includes(searchTerm)
+        );
+        renderProducts(filteredProducts);
     });
+
+    renderProducts(products);
 });
