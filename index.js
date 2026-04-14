@@ -4,7 +4,7 @@ let supabaseClient = null;
 let currentUser = null;
 let currentProfile = null;
 
-function initApp() {
+async function initApp() {
     console.log('Pet Connect initializing...');
     
     // Initialize Supabase
@@ -243,8 +243,8 @@ function initApp() {
         });
     }
     
-    // Check session
-    checkUserSession();
+    // Check session (must complete before event listeners run)
+    await checkUserSession();
     
     async function checkUserSession() {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -263,6 +263,8 @@ function initApp() {
                     postSection.classList.remove('hidden');
                     toggleBtn.classList.add('hidden');
                     postsContainer.classList.add('hidden');
+                    const loginPrompt = document.getElementById('postLoginPrompt');
+                    if (loginPrompt) loginPrompt.classList.add('hidden');
                 }
             }
             
@@ -338,6 +340,8 @@ function initApp() {
                 return;
             }
             if (postSection) postSection.classList.remove('hidden');
+            const loginPrompt = document.getElementById('postLoginPrompt');
+            if (loginPrompt) loginPrompt.classList.add('hidden');
             if (toggleBtn) toggleBtn.classList.add('hidden');
             if (postsContainer) postsContainer.classList.add('hidden');
         });
@@ -424,7 +428,7 @@ function initApp() {
 
 // Start when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
+    document.addEventListener('DOMContentLoaded', () => initApp());
 } else {
     initApp();
 }
