@@ -7,37 +7,109 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "Premium Dog Food",
             category: "Food",
             price: 29.99,
-            image: "assets/icons/default-pet.svg" 
+            image: "assets/images/product-icons/premium_food.jpeg"
         },
         {
             name: "Squeaky Mouse Toy",
             category: "Toys",
             price: 5.99,
-            image: "assets/icons/default-pet.svg"
+            image: "assets/images/product-icons/queaky Mouse Toy.jpeg"
         },
         {
             name: "Cat Scratching Post",
             category: "Toys",
             price: 45.00,
-            image: "assets/icons/default-pet.svg"
+            image: "assets/images/product-icons/Cat Scratching Post.jpeg"
         },
         {
-            name: "Puppy Collar (Red)",
+            name: "Puppy Collar (multiple colors)",
             category: "Accessories",
             price: 12.50,
-            image: "assets/icons/default-pet.svg"
+            image: "assets/images/product-icons/Puppy Collar.jpeg"
         },
         {
             name: "Organic Cat Treats",
             category: "Food",
             price: 8.99,
-            image: "assets/icons/default-pet.svg"
+            image: "assets/images/product-icons/Organic Cat Treats.jpeg"
         },
         {
             name: "Dog Bed (Large)",
             category: "Accessories",
             price: 59.99,
-            image: "assets/icons/default-pet.svg"
+            image: "assets/images/product-icons/Dog Bed (Large).jpeg"
+        },
+        {
+            name: "Catnip Mouse",
+            category: "Toys",
+            price: 3.99,
+            image: "assets/images/product-icons/Catnip Mouse.jpeg"
+        },
+        {
+            name: "Leather Dog Leash",
+            category: "Accessories",
+            price: 24.99,
+            image: "assets/images/product-icons/Leather Dog Leash.jpeg"
+        },
+        {
+            name: "Grain-Free Salmon Food",
+            category: "Food",
+            price: 34.99,
+            image: "assets/images/product-icons/Grain-Free Salmon Food.jpeg"
+        },
+        {
+            name: "Interactive Laser Toy",
+            category: "Toys",
+            price: 19.99,
+            image: "assets/images/product-icons/Interactive Laser Toy.jpeg"
+        },
+        {
+            name: "Cozy Cat Hamster Wheel",
+            category: "Toys",
+            price: 39.99,
+            image: "assets/images/product-icons/Cozy Cat Hamster Wheel.jpeg"
+        },
+        {
+            name: "Stainless Steel Food Bowl",
+            category: "Accessories",
+            price: 15.99,
+            image: "assets/images/product-icons/Stainless Steel Food Bowl.jpeg"
+        },
+        {
+            name: "Puppy Training Treats",
+            category: "Food",
+            price: 12.99,
+            image: "assets/images/product-icons/Puppy Training Treats.jpeg"
+        },
+        {
+            name: "Adjustable Cat Collar",
+            category: "Accessories",
+            price: 8.50,
+            image: "assets/images/product-icons/Adjustable Cat Collar.jpeg"
+        },
+        {
+            name: "Rope Tug Toy",
+            category: "Toys",
+            price: 11.99,
+            image: "assets/images/product-icons/Rope Tug Toy.jpeg"
+        },
+        {
+            name: "Water Fountain (Pet)",
+            category: "Accessories",
+            price: 49.99,
+            image: "assets/images/product-icons/Water Fountain.jpeg"
+        },
+        {
+            name: "Senior Dog Formula",
+            category: "Food",
+            price: 38.99,
+            image: "assets/images/product-icons/Senior Dog Formula.jpeg"
+        },
+        {
+            name: "Feather Wand",
+            category: "Toys",
+            price: 7.99,
+            image: "assets/images/product-icons/Feather Wand.jpeg"
         }
     ];
 
