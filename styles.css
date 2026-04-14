@@ -1,9 +1,11 @@
 html {
   height: 100%;
 }
+
 main {
   flex: 1;
 }
+
 :root {
   --primary-color: #4a90e2;
   --primary-hover: #357abd;
@@ -74,7 +76,7 @@ ul {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -100,6 +102,7 @@ header {
   font-weight: 800;
   font-size: 1.5rem;
   color: var(--primary-color);
+  padding-left: 1.5rem;
 }
 
 .nav-links {
@@ -233,6 +236,28 @@ textarea.form-control {
   color: #fff;
 }
 
+.btn-auth {
+    margin-right: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+    background: transparent;
+}
+.btn-auth:hover {
+    margin-right: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.2s ease;
+    background: transparent;
+    background: var(--primary-hover);
+}
 .btn:hover {
   background: var(--primary-hover);
 }
@@ -241,6 +266,13 @@ textarea.form-control {
   background: transparent;
   border: 2px solid var(--border-color);
   color: var(--text-color);
+}
+
+.loginIcon {
+    width: 60px;
+    height: 40px;
+
+
 }
 
 .submit-btn {
@@ -345,6 +377,46 @@ footer {
   margin-top: 2rem;
 }
 
+/* ── Posts ─────────────────────────────────────────────────────── */
+.posts-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.post-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  transition: 0.2s ease;
+}
+
+.post-card img.post-image {
+  width: 100%;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+.post-header {
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+}
+
+.post-date {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.post-caption {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .navbar {
@@ -402,4 +474,117 @@ footer {
 .vet-toast--visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* Auth Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: 0.3s ease;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.auth-modal {
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  padding: 2.5rem;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.close-modal {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.close-modal:hover {
+  color: var(--primary-color);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 1rem;
+  background: none;
+  border: none;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: 0.2s ease;
+  position: relative;
+}
+
+.auth-tab.active {
+  color: var(--primary-color);
+}
+
+.auth-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--primary-color);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-form.hidden {
+  display: none;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
 }

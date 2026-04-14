@@ -1,0 +1,2 @@
+export const supabaseUrl = "https://gprbvxplbrctdxpjvmkd.supabase.co";
+export const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwcmJ2eHBsYnJjdGR4cGp2bWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDkxMTksImV4cCI6MjA5MTIyNTExOX0.rbZdNaH2m7O0r8naOgzDn-KjGTDb58PXFxc4l0X7aI8";
