@@ -1,31 +1,39 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Vétérinaires – Pet Connect</title>
-    <meta name="description" content="Trouvez des vétérinaires locaux pour vos animaux de compagnie."/>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="./styles.css"/>
-    <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  </head>
-  <body>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Connect - Vétérinaires</title>
+    <meta name="description"
+        content="Une application sociale ouverte pour animaux de compagnie : offrant un espace aux utilisateurs pour partager leurs moments spéciaux, en apprendre plus sur leurs animaux et un espace pour l'adoption d'animaux. " />
+    <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+
+<body>
     <header>
-      <div class="container navbar">
-        <a href="index.html" class="logo">🐾 Pet Connect</a>
-        <nav class="nav-links">
-          <a href="index.html">Accueil</a>
-          <a href="adoption.html">Adoption</a>
-          <a href="shop.html">Boutique</a>
-          <a href="vets.html" class="active">Vétérinaires</a>
-          <a href="tips.html">Conseils</a>
-          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Changer le thème" title="Changer le thème">
-            <span id="theme-icon">🌙</span>
-          </button>
-        </nav>
-      </div>
+        <div class="container navbar">
+            <a href="index.html" class="logo">🐾 Pet Connect</a>
+            <nav class="nav-links">
+                <a href="index.html">Accueil</a>
+                <a href="adoption.html">Adoption</a>
+                <a href="shop.html">Boutique</a>
+                <a href="vets.html" class="active">Vétérinaires</a>
+                <a href="tips.html">Conseils</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Changer le thème" title="Changer le thème">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </nav>
+            <button id="auth-btn" class="btn-auth" title="Se connecter">
+                <img src="assets/images/signUp/android-chrome-192x192.png" class="loginIcon" id="auth-icon" alt="Se connecter" />
+            </button>
+        </div>
     </header>
 
     <main class="container">
@@ -81,25 +89,84 @@
       <p>© 2026 L2 INFO ISIMM.</p>
     </footer>
 
-    <script>
-      function setupThemeToggle() {
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-        themeToggle.addEventListener('click', () => {
-          const current = document.documentElement.getAttribute('data-theme');
-          const next = current === 'dark' ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-theme', next);
-          localStorage.setItem('theme', next);
-          updateThemeIcon(next);
-        });
-        function updateThemeIcon(theme) {
-          themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
-        }
-      }
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal-overlay hidden">
+        <div class="auth-modal card">
+            <button class="close-modal" id="closeAuthModal">&times;</button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="loginTab">Connexion</button>
+                <button class="auth-tab" id="signupTab">Inscription</button>
+            </div>
 
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="votre@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Mot de passe</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+            </form>
+
+            <form id="signupForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="signupName">Nom d'utilisateur</label>
+                    <input type="text" id="signupName" class="form-control" placeholder="JeanDupont" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPhone">Numéro de téléphone</label>
+                    <input type="tel" id="signupPhone" class="form-control" placeholder="06 12 34 56 78" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" class="form-control" placeholder="votre@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Mot de passe</label>
+                    <input type="password" id="signupPassword" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay hidden">
+        <div class="profile-modal card">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">JD</div>
+                <h2 id="profileUsername">Utilisateur</h2>
+                <p id="profileEmail" class="profile-email">email@example.com</p>
+            </div>
+            <form id="profileForm" class="profile-form">
+                <div class="form-group">
+                    <label for="profileUsername">Nom d'utilisateur</label>
+                    <input type="text" id="profileUsernameInput" class="form-control" placeholder="Votre nom">
+                </div>
+                <div class="form-group">
+                    <label for="profileEmail">Email</label>
+                    <input type="email" id="profileEmailInput" class="form-control" placeholder="votre@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="profilePhone">Téléphone</label>
+                    <input type="tel" id="profilePhone" class="form-control" placeholder="06 12 34 56 78">
+                </div>
+                <div class="form-group">
+                    <label for="profilePassword">Nouveau mot de passe</label>
+                    <input type="password" id="profilePassword" class="form-control" placeholder="Laisser vide pour ne pas changer">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Mettre à jour</button>
+            </form>
+            <div class="profile-actions">
+                <button id="logoutBtn" class="btn btn-secondary w-100">Déconnexion</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
       function showToast(msg) {
         const toast = document.getElementById('toast');
         toast.textContent = msg;
@@ -123,8 +190,10 @@
         });
       }
 
-      setupThemeToggle();
       setupSearch();
     </script>
-  </body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./index.js"></script>
+</body>
+
 </html>

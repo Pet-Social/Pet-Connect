@@ -585,6 +585,201 @@ footer {
 }
 
 .btn-primary:hover {
-  background: var(--primary-hover);
+    background: var(--primary-hover);
 }
+
+/* Avatar Styles */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.btn-auth:hover .user-avatar {
+    transform: scale(1.05);
+}
+
+/* Profile Modal Styles */
+.profile-modal {
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    padding: 2.5rem;
+    animation: modalFadeIn 0.3s ease;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+}
+
+.profile-email {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.profile-form {
+    margin-bottom: 1.5rem;
+}
+
+.profile-actions {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Login Prompt Overlay */
+.login-prompt-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(var(--card-bg-rgb, 255, 255, 255), 0.95);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: var(--radius);
+}
+
+[data-theme="dark"] .login-prompt-overlay {
+    background: rgba(30, 30, 30, 0.95);
+}
+
+.login-prompt-content {
+    text-align: center;
+    padding: 2rem;
+}
+
+.login-prompt-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.login-prompt-content h3 {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.login-prompt-content p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.login-prompt-overlay.hidden {
+    display: none;
+}
+
+/* Posts Filter */
+.posts-filter {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.filter-btn {
+    padding: 0.5rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    background: transparent;
+    color: var(--text-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Post Actions (Edit/Delete buttons) */
+.post-card {
+    position: relative;
+}
+
+.post-owner-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.post-edit-btn,
+.post-delete-btn {
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.post-edit-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.post-edit-btn:hover {
+    background: var(--primary-hover);
+}
+
+.post-delete-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.post-delete-btn:hover {
+    background: #c0392b;
+}
+
+/* Edit Post Modal */
+.edit-post-modal {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    padding: 2rem;
+}
+
+.edit-post-modal h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
 }

@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="./styles.css" />
     <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
 
-    <!-- Preconnect to external domains-->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 </head>
@@ -31,7 +30,9 @@
                     <span id="theme-icon">🌙</span>
                 </button>
             </nav>
-            <button id="auth-btn" class="btn-auth"><img src="assets/images/signUp/android-chrome-192x192.png" class="loginIcon" alt="Se connecter" /></button>
+            <button id="auth-btn" class="btn-auth" title="Se connecter">
+                <img src="assets/images/signUp/android-chrome-192x192.png" class="loginIcon" id="auth-icon" alt="Se connecter" />
+            </button>
         </div>
     </header>
 
@@ -41,10 +42,21 @@
             <button class="submit-btn" id="togglePostBtn" style="margin: 0 auto">
                 <span>📸 Partagez un moment avec votre animal</span>
             </button>
-            <br>
+            <div class="posts-filter">
+                <button class="filter-btn active" id="filterAll">Tous les posts</button>
+                <button class="filter-btn" id="filterMy">Mes posts</button>
+            </div>
             <section id="postsContainer" class="container"></section>
         </div>
         <section id="postSection" class="card hidden">
+            <div id="postLoginPrompt" class="login-prompt-overlay">
+                <div class="login-prompt-content">
+                    <div class="login-prompt-icon">🔒</div>
+                    <h3>Connexion requise</h3>
+                    <p>Vous devez être connecté pour publier un moment.</p>
+                    <button class="btn btn-primary" id="promptLoginBtn">Se connecter</button>
+                </div>
+            </div>
             <h2 class="mb-4">Créer une publication</h2>
             <form id="postForm">
                 <div class="form-group">
@@ -62,7 +74,7 @@
                             </svg>
                         </div>
                         <div class="text">
-                            <span>Sélectionnez votre image</span>
+                            <span id="imageStatusText">Sélectionnez votre image</span>
                         </div>
                         <input type="file" id="postImage" class="form-control" accept="image/*" required />
                     </label>
@@ -88,6 +100,7 @@
     <footer>
         <p>© 2026 L2 INFO ISIMM.</p>
     </footer>
+
     <!-- Authentication Modal -->
     <div id="authModal" class="modal-overlay hidden">
         <div class="auth-modal card">
@@ -113,8 +126,8 @@
             <!-- Signup Form -->
             <form id="signupForm" class="auth-form hidden">
                 <div class="form-group">
-                    <label for="signupName">Nom Complet</label>
-                    <input type="text" id="signupName" class="form-control" placeholder="Jean Dupont" required>
+                    <label for="signupName">Nom d'utilisateur</label>
+                    <input type="text" id="signupName" class="form-control" placeholder="JeanDupont" required>
                 </div>
                 <div class="form-group">
                     <label for="signupPhone">Numéro de téléphone</label>
@@ -129,6 +142,59 @@
                     <input type="password" id="signupPassword" class="form-control" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay hidden">
+        <div class="profile-modal card">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">JD</div>
+                <h2 id="profileUsername">Utilisateur</h2>
+                <p id="profileEmail" class="profile-email">email@example.com</p>
+            </div>
+            <form id="profileForm" class="profile-form">
+                <div class="form-group">
+                    <label for="profileUsername">Nom d'utilisateur</label>
+                    <input type="text" id="profileUsernameInput" class="form-control" placeholder="Votre nom">
+                </div>
+                <div class="form-group">
+                    <label for="profileEmail">Email</label>
+                    <input type="email" id="profileEmailInput" class="form-control" placeholder="votre@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="profilePhone">Téléphone</label>
+                    <input type="tel" id="profilePhone" class="form-control" placeholder="06 12 34 56 78">
+                </div>
+                <div class="form-group">
+                    <label for="profilePassword">Nouveau mot de passe</label>
+                    <input type="password" id="profilePassword" class="form-control" placeholder="Laisser vide pour ne pas changer">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Mettre à jour</button>
+            </form>
+            <div class="profile-actions">
+                <button id="logoutBtn" class="btn btn-secondary w-100">Déconnexion</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Post Modal -->
+    <div id="editPostModal" class="modal-overlay hidden">
+        <div class="edit-post-modal card">
+            <button class="close-modal" id="closeEditPostModal">&times;</button>
+            <h2>Modifier le post</h2>
+            <form id="editPostForm">
+                <div class="form-group">
+                    <label for="editPostCaption">Légende</label>
+                    <textarea id="editPostCaption" class="form-control" placeholder="Que fait votre animal ?"></textarea>
+                </div>
+                <div class="post-actions">
+                    <button type="submit" class="btn">Enregistrer</button>
+                    <button type="button" id="deletePostBtn" class="btn btn-danger">Supprimer</button>
+                    <button type="button" id="cancelEditBtn" class="btn btn-secondary">Annuler</button>
+                </div>
             </form>
         </div>
     </div>
