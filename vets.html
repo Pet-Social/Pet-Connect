@@ -26,7 +26,7 @@
                 <a href="shop.html">Boutique</a>
                 <a href="vets.html" class="active">Vétérinaires</a>
                 <a href="tips.html">Conseils</a>
-                <button id="theme-toggle" class="theme-toggle-btn" title="Changer le thème">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Changer le thème" title="Changer le thème">
                     <span id="theme-icon">🌙</span>
                 </button>
             </nav>
@@ -37,11 +37,56 @@
     </header>
 
     <main class="container">
-        <!--Placez votre code ici-->
+      <h1 class="text-center mb-4">Vétérinaires à proximité</h1>
+
+      <input class="form-control mb-4" type="text" id="search" placeholder="Rechercher un vétérinaire..." aria-label="Rechercher un vétérinaire"/>
+
+      <div class="grid-container" id="vet-grid">
+
+        <article class="card vet-card" data-name="animacare wissem ketata teniour">
+          <h3>Clinique AnimaCare</h3>
+          <p>Route de Teniour, 1.5 km du centre-ville, Sfax</p>
+          <p class="vet-meta">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.7</p>
+          <p class="vet-meta">Lun–Sam : 9h–19h</p>
+          <div class="vet-contact">
+            <p><strong>Tél :</strong> <a href="tel:+21695080695" onclick="showToast('Appel en cours...')">+216 95 080 695</a></p>
+            <p><a href="https://www.google.com/maps/search/Clinique+Vétérinaire+AnimaCare+Sfax" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
+          </div>
+        </article>
+
+        <article class="card vet-card" data-name="louati zouhir sfax sud aeroport">
+          <h3>Dr. Zouhir Louati</h3>
+          <p>Route de l'Aéroport KM 0.5, Sfax Sud 3083</p>
+          <p class="vet-meta">🐕 Chiens &amp; Chats &nbsp;|&nbsp; ⭐ 4.5</p>
+          <p class="vet-meta">Lun–Ven : 8h–18h &nbsp;|&nbsp; Sam : 8h–13h</p>
+          <div class="vet-contact">
+            <p><strong>Tél :</strong> <a href="tel:+21674000000" onclick="showToast('Appel en cours...')">+216 74 000 000</a></p>
+            <p><a href="https://www.google.com/maps/search/Dr+Louati+Zouhir+vétérinaire+Sfax+Sud" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
+          </div>
+        </article>
+
+        <article class="card vet-card" data-name="clinique amal route mahdia sfax">
+          <h3>Clinique Vétérinaire Amal</h3>
+          <p>Route de Mahdia KM 9, Sfax</p>
+          <p class="vet-meta">🐇 Tous animaux &nbsp;|&nbsp; ⭐ 4.8</p>
+          <p class="vet-meta">Lun–Sam : 9h–20h</p>
+          <div class="vet-contact">
+            <p><strong>Tél :</strong> <a href="tel:+21674000001" onclick="showToast('Appel en cours...')">+216 74 000 001</a></p>
+            <p><a href="https://www.google.com/maps/search/Clinique+Vétérinaire+Amal+Route+Mahdia+Sfax" target="_blank" rel="noopener noreferrer" onclick="showToast('Ouverture dans Maps...')">📍 Voir sur Google Maps</a></p>
+          </div>
+        </article>
+
+      </div>
+
+      <p class="hidden text-center" id="no-results">
+        Aucun vétérinaire trouvé pour cette recherche.
+      </p>
     </main>
 
+    <div class="vet-toast" id="toast"></div>
+
     <footer>
-        <p>© 2026 L2 INFO ISIMM.</p>
+      <p>© 2026 L2 INFO ISIMM.</p>
     </footer>
 
     <!-- Authentication Modal -->
@@ -121,6 +166,32 @@
         </div>
     </div>
 
+    <script>
+      function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('vet-toast--visible');
+        setTimeout(() => toast.classList.remove('vet-toast--visible'), 2500);
+      }
+
+      function setupSearch() {
+        const input = document.getElementById('search');
+        const cards = document.querySelectorAll('.vet-card');
+        const noResults = document.getElementById('no-results');
+        input.addEventListener('input', () => {
+          const query = input.value.toLowerCase().trim();
+          let visible = 0;
+          cards.forEach(card => {
+            const match = card.textContent.toLowerCase().includes(query) || card.dataset.name.includes(query);
+            card.style.display = match ? '' : 'none';
+            if (match) visible++;
+          });
+          noResults.classList.toggle('hidden', visible > 0);
+        });
+      }
+
+      setupSearch();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="./index.js"></script>
 </body>
