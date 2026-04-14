@@ -1,3 +1,8 @@
+import { supabaseUrl, supabaseKey } from './config.js';
+
+// Initialize Supabase
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
 // Theme changing
 function setupThemeToggle() {
     const themeToggle = document.getElementById("theme-toggle");
@@ -127,19 +132,86 @@ function setupAuthModal() {
         loginForm.classList.add("hidden");
     });
 
-    // Mock submissions
-    loginForm.addEventListener("submit", (e) => {
+    // Login Form Submission
+    loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        alert("Connexion réussie (Simulation)");
-        authModal.classList.add("hidden");
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Erreur de connexion : " + error.message);
+                return;
+            }
+
+            alert("Connexion réussie!");
+            authModal.classList.add("hidden");
+            // Optional: Update UI to show logged-in state
+            updateUIForLoggedInUser(data.user);
+        } catch (err) {
+            console.error("Erreur inattendue:", err);
+            alert("Une erreur est survenue lors de la connexion.");
+        }
     });
 
-    signupForm.addEventListener("submit", (e) => {
+    // Signup Form Submission
+    signupForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        alert("Compte créé avec succès (Simulation)");
-        authModal.classList.add("hidden");
+        const name = document.getElementById("signupName").value;
+        const phone = document.getElementById("signupPhone").value;
+        const email = document.getElementById("signupEmail").value;
+        const password = document.getElementById("signupPassword").value;
+
+        try {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: name,
+                        phone: phone,
+                    }
+                }
+            });
+
+            if (error) {
+                alert("Erreur d'inscription : " + error.message);
+                return;
+            }
+
+            alert("Compte créé avec succès ! Vous êtes maintenant connecté.");
+            authModal.classList.add("hidden");
+            // Automatically update UI since email confirmation is disabled
+            updateUIForLoggedInUser(data.user);
+        } catch (err) {
+            console.error("Erreur inattendue:", err);
+            alert("Une erreur est survenue lors de l'inscription.");
+        }
     });
 }
+
+function updateUIForLoggedInUser(user) {
+    if (user) {
+        console.log("User logged in:", user.email);
+        // You can update the header, show user profile icon, etc.
+        // document.getElementById("auth-btn").innerHTML = "Déconnexion";
+    }
+}
+
+// Check if user is already logged in on page load
+async function checkUserSession() {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    if (session) {
+        updateUIForLoggedInUser(session.user);
+    }
+}
+
+checkUserSession();
 
 setupAuthModal();
 loadTestPosts();
