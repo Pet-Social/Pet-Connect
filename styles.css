@@ -504,6 +504,19 @@ footer {
   animation: modalFadeIn 0.3s ease;
 }
 
+.cart-modal {
+  width: 100%;
+  max-width: 450px;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: modalFadeIn 0.3s ease;
+}
+
+.cart-modal h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
 @keyframes modalFadeIn {
   from {
     opacity: 0;
@@ -860,3 +873,127 @@ footer {
   text-align: center;
 }
 
+.cart-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: 0.2s ease;
+}
+
+.cart-btn:hover {
+  background: var(--primary-hover);
+}
+
+/* ── Cart Modal ─────────────────────────────────────────────────── */
+.cart-modal {
+  width: 100%;
+  max-width: 450px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.cart-modal h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.cart-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem 0;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cart-item-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cart-item-price {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantity-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+.quantity-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  transition: 0.2s ease;
+}
+
+.remove-btn:hover {
+  color: #e74c3c;
+}
+
+.cart-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: right;
+  padding: 1rem 0;
+  color: var(--primary-color);
+  border-top: 2px solid var(--border-color);
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 500px) {
+  .shop-search {
+    flex-direction: column;
+  }
+  
+  .cart-btn {
+    width: 100%;
+  }
+}
