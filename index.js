@@ -243,45 +243,23 @@ async function initApp() {
         });
     }
     
-    // Check session (must complete before event listeners run)
-    await checkUserSession();
-    
-    async function checkUserSession() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            currentUser = session.user;
-            currentProfile = await loadProfile(session.user.id);
-            updateAuthButton(session.user, currentProfile);
-            
-            // Post-specific: show post form if just logged in
-            const postSection = document.getElementById('postSection');
-            const toggleBtn = document.getElementById('togglePostBtn');
-            const postsContainer = document.getElementById('postsContainer');
-            if (localStorage.getItem('justLoggedIn') === 'true') {
-                localStorage.removeItem('justLoggedIn');
-                if (postSection && toggleBtn && postsContainer) {
-                    postSection.classList.remove('hidden');
-                    toggleBtn.classList.add('hidden');
-                    postsContainer.classList.add('hidden');
-                    const loginPrompt = document.getElementById('postLoginPrompt');
-                    if (loginPrompt) loginPrompt.classList.add('hidden');
-                }
-            }
-            
-            // Load posts if on index page
-            loadPosts();
-        } else {
-            updateAuthButton(null, null);
-            loadPosts();
-        }
-    }
+    // Filter variables (declare before use)
+    let currentFilter = 'all';
     
     // Load posts
     async function loadPosts() {
         const postsContainer = document.getElementById('postsContainer');
-        if (!postsContainer) return;
-        if (!supabaseClient) return;
+        if (!postsContainer) {
+            console.log('No postsContainer found');
+            return;
+        }
+        if (!supabaseClient) {
+            console.log('No supabaseClient, retrying...');
+            setTimeout(() => loadPosts(), 50);
+            return;
+        }
         
+        console.log('Loading posts...');
         postsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Chargement...</p>';
         
         let query = supabaseClient.from('posts').select('*, profiles:user_id (username)');
@@ -291,6 +269,8 @@ async function initApp() {
         }
         
         const { data: posts, error } = await query.order('created_at', { ascending: false });
+        
+        console.log('Posts query result:', { posts, error });
         
         if (error) {
             console.error('Error loading posts:', error);
@@ -320,7 +300,6 @@ async function initApp() {
             postsContainer.appendChild(div);
         });
         
-        // Delete handlers
         document.querySelectorAll('.post-delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 if (!confirm('Supprimer ce post?')) return;
@@ -330,6 +309,38 @@ async function initApp() {
             });
         });
     }
+    
+    // Check session and load initial data
+    async function checkUserSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            currentProfile = await loadProfile(session.user.id);
+            updateAuthButton(session.user, currentProfile);
+            
+            if (localStorage.getItem('justLoggedIn') === 'true') {
+                localStorage.removeItem('justLoggedIn');
+                const postSection = document.getElementById('postSection');
+                const toggleBtn = document.getElementById('togglePostBtn');
+                const loginPrompt = document.getElementById('postLoginPrompt');
+                if (postSection) postSection.classList.remove('hidden');
+                if (toggleBtn) toggleBtn.classList.add('hidden');
+                if (loginPrompt) loginPrompt.classList.add('hidden');
+            }
+        } else {
+            updateAuthButton(null, null);
+        }
+        loadPosts();
+    }
+    
+    // Check session (must complete before event listeners run)
+    await checkUserSession();
+    
+    // Ensure posts are loaded after session check
+    setTimeout(() => {
+        console.log('Delayed loadPosts call');
+        loadPosts();
+    }, 100);
     
     // Post form (index page only)
     const postForm = document.getElementById('postForm');
@@ -396,7 +407,8 @@ async function initApp() {
     // Filter buttons
     const filterAllBtn = document.getElementById('filterAll');
     const filterMyBtn = document.getElementById('filterMy');
-    let currentFilter = 'all';
+    
+    if (filterAllBtn) filterAllBtn.classList.add('active');
     
     if (filterAllBtn) {
         filterAllBtn.addEventListener('click', () => {
