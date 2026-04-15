@@ -845,3 +845,18 @@ footer {
   grid-column: 1 / -1;
   padding: 2rem;
 }
+
+/* ── Shop Search & Cart ─────────────────────────────────────────── */
+.shop-search {
+  display: flex;
+  gap: 1rem;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+  align-items: center;
+}
+
+.shop-search input {
+  flex: 1;
+  text-align: center;
+}
+

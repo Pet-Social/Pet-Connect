@@ -39,6 +39,9 @@
     <main class="container">
         <div class="shop-search">
             <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un produit...">
+            <button id="cart-btn" class="cart-btn">
+                <p>🛒 Panier <span id="cart-count">0</span></p>
+            </button>
         </div>
         <div id="shopGrid" class="shop-grid"></div>
     </main>
@@ -121,6 +124,17 @@
             <div class="profile-actions">
                 <button id="logoutBtn" class="btn btn-secondary w-100">Déconnexion</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="modal-overlay hidden">
+        <div class="cart-modal card">
+            <button class="close-modal" id="close-cart">&times;</button>
+            <h2>Votre Panier</h2>
+            <div id="cart-items"></div>
+            <div id="cart-total"></div>
+            <button id="confirm-order" class="btn btn-primary w-100">Confirmer la Commande</button>
         </div>
     </div>
 
