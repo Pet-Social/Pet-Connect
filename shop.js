@@ -44,11 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('article');
         card.className = 'card';
         card.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" class="product-image" style="height: 200px; object-fit: contain; padding: 1rem; background: #f9f9f9;">
+            <img src="${product.image}" alt="${product.name}" class="product-image">
             <h3>${product.name}</h3>
-            <p style="color: #666; font-size: 0.9rem;">${product.category}</p>
+            <p class="product-category">${product.category}</p>
             <div class="product-price">$${product.price.toFixed(2)}</div>
-            <button class="btn" style="width: 100%;" onclick="alert('L\'achat n\'est pas disponible dans la démo')">Acheter maintenant</button>
+            <button class="btn shop-buy-btn" onclick="alert('L\'achat n\'est pas disponible dans la démo')">Acheter maintenant</button>
         `;
         shopGrid.appendChild(card);
     });

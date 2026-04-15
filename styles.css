@@ -335,6 +335,51 @@ footer {
   gap: 1.25rem;
 }
 
+#shopGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+#shopGrid .card {
+  margin-bottom: 0;
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#shopGrid .card h3 {
+  font-size: 1.02rem;
+  line-height: 1.35;
+  min-height: 2.75rem;
+}
+
+.product-image {
+  height: 220px;
+  width: 100%;
+  object-fit: contain;
+  padding: 1rem;
+  border-radius: 10px;
+  background: white;
+}
+
+.product-category {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.product-price {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary-color);
+}
+
+.shop-buy-btn {
+  width: 100%;
+  margin-top: auto;
+}
+
 .vet-card {
   margin-bottom: 0;
   padding: 1.25rem;
@@ -445,6 +490,10 @@ footer {
   .submit-btn span {
     padding: 14px;
     font-size: 0.95rem;
+  }
+
+  #shopGrid {
+    grid-template-columns: 1fr;
   }
 }
 
