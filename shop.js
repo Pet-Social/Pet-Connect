@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <img src="${product.image}" alt="${product.name}" class="product-image">
             <h3>${product.name}</h3>
             <p class="product-category">${product.category}</p>
-            <div class="product-price">$${product.price.toFixed(2)}</div>
+            <div class="product-price">${product.price.toFixed(2)} DT</div>
             <button class="btn shop-buy-btn" onclick="alert('L\'achat n\'est pas disponible dans la démo')">Acheter maintenant</button>
         `;
         shopGrid.appendChild(card);
