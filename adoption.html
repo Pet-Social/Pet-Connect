@@ -5,13 +5,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pet Connect - Adoption</title>
-    <meta name="description"
-        content="Une application sociale ouverte pour animaux de compagnie : offrant un espace aux utilisateurs pour partager leurs moments spéciaux, en apprendre plus sur leurs animaux et un espace pour l'adoption d'animaux. " />
+    <meta name="description" content="Une application sociale ouverte pour animaux de compagnie : offrant un espace aux utilisateurs pour partager leurs moments spéciaux, en apprendre plus sur leurs animaux et un espace pour l'adoption d'animaux. " />
     <link href="https://fonts.googleapis.com/css2?family=outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
-
     <link rel="stylesheet" href="./styles.css" />
     <link rel="icon" type="image/svg+xml" href="assets/images/default-pet.svg" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 </head>
@@ -37,14 +34,79 @@
     </header>
 
     <main class="container">
-        <!--Placez votre code ici-->
+        <div class="text-center mb-4">
+            <button id="toggleAdoptionBtn" class="submit-btn">
+                <span>🐾 Proposer un animal à adopter</span>
+            </button>
+        </div>
+
+        <section id="adoptionSection" class="card hidden">
+            <h2 class="mb-4">Proposer un animal</h2>
+            <form id="adoptionForm">
+                <div class="form-group">
+                    <label for="petName">Nom de l'animal</label>
+                    <input type="text" id="petName" class="form-control" required placeholder="ex: Max" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="petAge">Âge (années)</label>
+                    <input type="number" id="petAge" class="form-control" min="0" step="0.5" required placeholder="ex: 2.5" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="petType">Type</label>
+                    <select id="petType" class="form-control">
+                        <option value="Chat">Chat</option>
+                        <option value="Chien">Chien</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contactPhone">Numéro de téléphone (+216)</label>
+                    <input type="tel" id="contactPhone" class="form-control" pattern="\+216[0-9]{8}" placeholder="+216 12345678" value="+216" required autocomplete="off">
+                    <small class="text-muted">Format: +216xxxxxxxx</small>
+                </div>
+                <div class="form-group">
+                    <label>Statut vaccinal</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="vaxStatus" value="Vaccinated"> Vacciné
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="vaxStatus" value="Not Vaccinated" checked> Non vacciné
+                        </label>
+                    </div>
+                    <div id="vaccineList" class="vax-list-container hidden">
+                        <p class="vax-list-title">Sélectionnez les vaccins administrés:</p>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vaccines" value="Rage"> Rage <small class="text-muted">(3 mois+)</small>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vaccines" value="Vermifuge"> Vermifuge <small class="text-muted">(2 semaines+)</small>
+                        </label>
+                        <label class="checkbox-label dog-vax">
+                            <input type="checkbox" name="vaccines" value="Maladie de Carré/Parvovirose"> Maladie de Carré/Parvovirose (DHLPP) <small class="text-muted">(6 semaines+)</small>
+                        </label>
+                        <label class="checkbox-label cat-vax hidden">
+                            <input type="checkbox" name="vaccines" value="Typhus/Coryza"> Typhus/Coryza (Tricat) <small class="text-muted">(6 semaines+)</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="petImage">Photo de l'animal (optionnel)</label>
+                    <input type="file" id="petImage" class="form-control" accept="image/*">
+                </div>
+                <div class="post-actions">
+                    <button type="submit" class="btn">Mettre en adoption</button>
+                    <button type="button" id="cancelAdoptionBtn" class="btn btn-secondary">Annuler</button>
+                </div>
+            </form>
+        </section>
+
+        <div id="adoptionList" class="grid-container"></div>
     </main>
 
     <footer>
         <p>© 2026 L2 INFO ISIMM.</p>
     </footer>
 
-    <!-- Authentication Modal -->
     <div id="authModal" class="modal-overlay hidden">
         <div class="auth-modal card">
             <button class="close-modal" id="closeAuthModal">&times;</button>
@@ -52,7 +114,6 @@
                 <button class="auth-tab active" id="loginTab">Connexion</button>
                 <button class="auth-tab" id="signupTab">Inscription</button>
             </div>
-
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
                     <label for="loginEmail">Email</label>
@@ -64,7 +125,6 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Se connecter</button>
             </form>
-
             <form id="signupForm" class="auth-form hidden">
                 <div class="form-group">
                     <label for="signupName">Nom d'utilisateur</label>
@@ -87,7 +147,6 @@
         </div>
     </div>
 
-    <!-- Profile Modal -->
     <div id="profileModal" class="modal-overlay hidden">
         <div class="profile-modal card">
             <button class="close-modal" id="closeProfileModal">&times;</button>
@@ -122,6 +181,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./adoption.js"></script>
     <script type="module" src="./index.js"></script>
 </body>
 

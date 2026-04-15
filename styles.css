@@ -276,7 +276,7 @@ textarea.form-control {
 }
 
 .submit-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 3px;
@@ -332,6 +332,12 @@ footer {
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+#adoptionList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
 }
 
@@ -996,4 +1002,76 @@ footer {
   .cart-btn {
     width: 100%;
   }
+}
+
+/* ── Adoption Page ─────────────────────────────────────────────── */
+#adoptionSection.card {
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+.adoption-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.radio-label input {
+  margin-right: 0.25rem;
+}
+
+.vax-list-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.vax-list-container.hidden {
+  display: none;
+}
+
+.vax-list-title {
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5rem;
+}
+
+.dog-vax.hidden,
+.cat-vax.hidden {
+  display: none;
 }
