@@ -345,7 +345,6 @@ footer {
   margin-bottom: 1.5rem;
 }
 
-/* ── Vets + Shared Grid ───────────────────────────────────────── */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
