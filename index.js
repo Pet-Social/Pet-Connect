@@ -179,6 +179,11 @@ async function initApp() {
         deletePostFromModalBtn.addEventListener('click', async () => {
             if (!confirm('Supprimer ce post?')) return;
             if (currentEditPostId) {
+                const { data: post } = await supabaseClient.from('posts').select('image_url').eq('id', currentEditPostId).single();
+                if (post?.image_url) {
+                    const fileName = post.image_url.split('/post-images/')[1];
+                    if (fileName) await supabaseClient.storage.from('post-images').remove([fileName]);
+                }
                 await supabaseClient.from('posts').delete().eq('id', currentEditPostId);
                 closeEditModal();
                 loadPosts();
@@ -349,6 +354,11 @@ async function initApp() {
             btn.addEventListener('click', async (e) => {
                 if (!confirm('Supprimer ce post?')) return;
                 const id = e.target.dataset.id;
+                const { data: post } = await supabaseClient.from('posts').select('image_url').eq('id', id).single();
+                if (post?.image_url) {
+                    const fileName = post.image_url.split('/post-images/')[1];
+                    if (fileName) await supabaseClient.storage.from('post-images').remove([fileName]);
+                }
                 await supabaseClient.from('posts').delete().eq('id', id);
                 loadPosts();
             });

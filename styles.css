@@ -178,7 +178,19 @@ header {
   color: var(--text-color);
   transition: 0.2s ease;
 }
-
+.form-control::file-selector-button{
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+.form-control::file-selector-button:hover {
+  background: var(--primary-hover);
+}
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
@@ -333,7 +345,6 @@ footer {
   margin-bottom: 1.5rem;
 }
 
-/* ── Vets + Shared Grid ───────────────────────────────────────── */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1099,4 +1110,82 @@ footer {
 .dog-vax.hidden,
 .cat-vax.hidden {
   display: none;
+}
+
+/* ── Adoption Cards ───────────────────────────────────────────── */
+.adoption-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: 0.2s ease;
+}
+
+.adoption-card:hover {
+  transform: translateY(-2px);
+}
+
+.adoption-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.adoption-image-placeholder {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  background: var(--bg-color);
+}
+
+.adoption-content {
+  padding: 1rem;
+}
+
+.adoption-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.adoption-pet-name {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+.adoption-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.adoption-delete-btn {
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #e74c3c;
+  color: white;
+  transition: 0.2s ease;
+}
+
+.adoption-delete-btn:hover {
+  background: #c0392b;
+}
+
+.adoption-info {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.adoption-info a {
+  color: var(--primary-color);
 }

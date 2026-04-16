@@ -1,197 +1,435 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
-    const form = document.getElementById('adoptionForm');
-    const list = document.getElementById('adoptionList');
-    const adoptionSection = document.getElementById('adoptionSection');
+import { supabaseUrl, supabaseKey } from './config.js';
+
+let supabaseClient = null;
+let currentUser = null;
+let currentProfile = null;
+
+async function initAdoptionApp() {
+    if (!window.supabase) {
+        console.error('Supabase library not loaded!');
+        return;
+    }
+
+    supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const authBtn = document.getElementById('auth-btn');
+    const authModal = document.getElementById('authModal');
+    const closeAuthBtn = document.getElementById('closeAuthModal');
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const profileModal = document.getElementById('profileModal');
+    const closeProfileBtn = document.getElementById('closeProfileModal');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+        themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
+    function getInitials(username) {
+        if (!username) return 'U';
+        const parts = username.trim().split(/\s+/);
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        return username.slice(0, 2).toUpperCase();
+    }
+
+    function updateAuthButton(user, profile) {
+        currentUser = user;
+        currentProfile = profile;
+        if (!authBtn) return;
+        if (user) {
+            const username = profile?.username || user.user_metadata?.full_name || user.email;
+            authBtn.innerHTML = `<div class="user-avatar">${getInitials(username)}</div>`;
+            authBtn.title = username;
+            const toggleBtn = document.getElementById('toggleAdoptionBtn');
+            if (toggleBtn) toggleBtn.classList.remove('hidden');
+        } else {
+            authBtn.innerHTML = `<img src="assets/images/signUp/android-chrome-192x192.png" class="loginIcon" alt="Se connecter" />`;
+            authBtn.title = 'Se connecter';
+            const toggleBtn = document.getElementById('toggleAdoptionBtn');
+            if (toggleBtn) toggleBtn.classList.add('hidden');
+        }
+    }
+
+    async function loadProfile(userId) {
+        const { data } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+        return data || null;
+    }
+
+    async function createProfile(userId, username, phone = null) {
+        const { data } = await supabaseClient
+            .from('profiles')
+            .insert([{ id: userId, username, phone }])
+            .select()
+            .single();
+        return data;
+    }
+
+    async function logout() {
+        await supabaseClient.auth.signOut();
+        location.reload();
+    }
+
+    function openAuthModal() {
+        if (authModal) authModal.classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+        if (authModal) authModal.classList.add('hidden');
+        if (loginForm) loginForm.reset();
+        if (signupForm) signupForm.reset();
+    }
+
+    function openProfileModal() {
+        if (!currentUser) return;
+        const username = currentProfile?.username || currentUser.user_metadata?.full_name || 'Utilisateur';
+        const avatar = document.getElementById('profileAvatar');
+        const uname = document.getElementById('profileUsername');
+        const email = document.getElementById('profileEmail');
+        if (avatar) avatar.textContent = getInitials(username);
+        if (uname) uname.textContent = username;
+        if (email) email.textContent = currentUser.email;
+        if (profileModal) profileModal.classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+        if (profileModal) profileModal.classList.add('hidden');
+    }
+
+    if (authBtn) {
+        authBtn.addEventListener('click', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                currentProfile = await loadProfile(session.user.id);
+                updateAuthButton(session.user, currentProfile);
+                openProfileModal();
+            } else {
+                openAuthModal();
+            }
+        });
+    }
+
+    if (closeAuthBtn) closeAuthBtn.addEventListener('click', closeAuthModal);
+    if (authModal) {
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeAuthModal();
+        });
+    }
+    if (closeProfileBtn) closeProfileBtn.addEventListener('click', closeProfileModal);
+    if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) closeProfileModal();
+        });
+    }
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+    if (loginTab) {
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            if (signupTab) signupTab.classList.remove('active');
+            if (loginForm) loginForm.classList.remove('hidden');
+            if (signupForm) signupForm.classList.add('hidden');
+        });
+    }
+    if (signupTab) {
+        signupTab.addEventListener('click', () => {
+            signupTab.classList.add('active');
+            if (loginTab) loginTab.classList.remove('active');
+            if (signupForm) signupForm.classList.remove('hidden');
+            if (loginForm) loginForm.classList.add('hidden');
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert('Erreur de connexion: ' + error.message);
+                return;
+            }
+            location.reload();
+        });
+    }
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const phone = document.getElementById('signupPhone').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const { data, error } = await supabaseClient.auth.signUp({
+                email, password,
+                options: { data: { full_name: name } }
+            });
+            if (error) {
+                alert('Erreur d\'inscription: ' + error.message);
+                return;
+            }
+            if (data.user) {
+                await createProfile(data.user.id, name, phone);
+            }
+            location.reload();
+        });
+    }
+
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('profileUsernameInput').value.trim();
+            const newEmail = document.getElementById('profileEmailInput').value.trim();
+            const newPhone = document.getElementById('profilePhone').value.trim();
+            const newPassword = document.getElementById('profilePassword').value;
+            if (newEmail !== currentUser.email) {
+                await supabaseClient.auth.updateUser({ email: newEmail });
+            }
+            if (newPassword) {
+                await supabaseClient.auth.updateUser({ password: newPassword });
+            }
+            await supabaseClient
+                .from('profiles')
+                .update({ username: newUsername, phone: newPhone })
+                .eq('id', currentUser.id);
+            alert('Profil mis à jour!');
+            location.reload();
+        });
+    }
+
+    async function checkUserSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            currentProfile = await loadProfile(session.user.id);
+            updateAuthButton(session.user, currentProfile);
+        } else {
+            updateAuthButton(null, null);
+        }
+        loadAdoptions();
+    }
+
+    await checkUserSession();
+
     const toggleBtn = document.getElementById('toggleAdoptionBtn');
     const cancelBtn = document.getElementById('cancelAdoptionBtn');
-    
+    const adoptionSection = document.getElementById('adoptionSection');
+    const adoptionForm = document.getElementById('adoptionForm');
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            if (!currentUser) {
+                openAuthModal();
+                return;
+            }
+            const phoneInput = document.getElementById('contactPhone');
+            if (phoneInput) {
+                phoneInput.value = currentProfile?.phone || currentUser.email;
+            }
+            if (adoptionSection) adoptionSection.classList.remove('hidden');
+            if (toggleBtn) toggleBtn.classList.add('hidden');
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            if (adoptionSection) adoptionSection.classList.add('hidden');
+            if (toggleBtn) toggleBtn.classList.remove('hidden');
+            if (adoptionForm) adoptionForm.reset();
+        });
+    }
+
+    if (adoptionForm) {
+        adoptionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                openAuthModal();
+                return;
+            }
+
+            const petName = document.getElementById('petName').value.trim();
+            const petAge = document.getElementById('petAge').value;
+            const petType = document.getElementById('petType').value;
+            const contactPhone = document.getElementById('contactPhone').value;
+            const vaxStatus = document.querySelector('input[name="vaxStatus"]:checked').value;
+            const vaccines = Array.from(document.querySelectorAll('input[name="vaccines"]:checked')).map(cb => cb.value);
+            const imageFile = document.getElementById('petImage').files[0];
+
+            let imageUrl = null;
+            if (imageFile) {
+                const fileName = `adoptions/${currentUser.id}/${Date.now()}.${imageFile.name.split('.').pop()}`;
+                await supabaseClient.storage.from('adoption-images').upload(fileName, imageFile);
+                const { data: urlData } = supabaseClient.storage.from('adoption-images').getPublicUrl(fileName);
+                imageUrl = urlData.publicUrl;
+            }
+
+            const { error } = await supabaseClient.from('adoptions').insert([{
+                user_id: currentUser.id,
+                pet_name: petName,
+                pet_age: petAge,
+                pet_type: petType,
+                contact_phone: contactPhone,
+                vaccination_status: vaxStatus,
+                vaccines: vaccines,
+                image_url: imageUrl
+            }]);
+
+            if (error) {
+                alert('Erreur: ' + error.message);
+                return;
+            }
+
+            adoptionForm.reset();
+            if (adoptionSection) adoptionSection.classList.add('hidden');
+            if (toggleBtn) toggleBtn.classList.remove('hidden');
+            loadAdoptions();
+        });
+    }
+
     const petTypeSelect = document.getElementById('petType');
+    if (petTypeSelect) {
+        petTypeSelect.addEventListener('change', (e) => {
+            const dogVax = document.querySelectorAll('.dog-vax');
+            const catVax = document.querySelectorAll('.cat-vax');
+            if (e.target.value === 'Chien') {
+                dogVax.forEach(el => el.classList.remove('hidden'));
+                catVax.forEach(el => el.classList.add('hidden'));
+            } else {
+                dogVax.forEach(el => el.classList.add('hidden'));
+                catVax.forEach(el => el.classList.remove('hidden'));
+            }
+        });
+    }
+
     const vaxRadios = document.querySelectorAll('input[name="vaxStatus"]');
-    const vaccineListContainer = document.getElementById('vaccineList');
-    const dogVax = document.querySelectorAll('.dog-vax');
-    const catVax = document.querySelectorAll('.cat-vax');
-
-    // Load saved adoptions
-    loadAdoptions();
-
-    // --- Toggle Form Visibility ---
-    function toggleForm() {
-        const isHidden = adoptionSection.classList.contains('hidden');
-        if (isHidden) {
-            adoptionSection.classList.remove('hidden');
-            toggleBtn.classList.add('hidden');
-        } else {
-            adoptionSection.classList.add('hidden');
-            toggleBtn.classList.remove('hidden');
-        }
-    }
-
-    toggleBtn.addEventListener('click', toggleForm);
-    cancelBtn.addEventListener('click', toggleForm);
-
-    // --- Vaccine List Logic ---
+    const vaccineList = document.getElementById('vaccineList');
     vaxRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if (e.target.value === 'Vaccinated') {
-                vaccineListContainer.classList.remove('hidden');
-            } else {
-                vaccineListContainer.classList.add('hidden');
-                document.querySelectorAll('input[name="vaccines"]').forEach(cb => cb.checked = false);
+        radio.addEventListener('change', () => {
+            if (vaccineList) {
+                if (document.querySelector('input[name="vaxStatus"]:checked').value === 'Vaccinated') {
+                    vaccineList.classList.remove('hidden');
+                } else {
+                    vaccineList.classList.add('hidden');
+                }
             }
         });
     });
 
-    petTypeSelect.addEventListener('change', (e) => {
-        const type = e.target.value;
-        if (type === 'Dog') {
-            dogVax.forEach(el => el.classList.remove('hidden'));
-            catVax.forEach(el => el.classList.add('hidden'));
-            catVax.forEach(el => {
-                const cb = el.querySelector('input');
-                if(cb) cb.checked = false;
+    async function loadAdoptions() {
+        const adoptionList = document.getElementById('adoptionList');
+        if (!adoptionList) return;
+
+        adoptionList.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Chargement...</p>';
+
+        const { data: adoptions, error } = await supabaseClient
+            .from('adoptions')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Adoption load error:', error);
+            adoptionList.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Erreur: ' + error.message + '</p>';
+            return;
+        }
+
+        if (!adoptions || adoptions.length === 0) {
+            adoptionList.innerHTML = '<p style="text-align:center;color:var(--text-muted)">Aucun animal en adoption pour le moment</p>';
+            return;
+        }
+
+        const userIds = [...new Set(adoptions.map(a => a.user_id))];
+        const { data: profiles } = await supabaseClient
+            .from('profiles')
+            .select('id, username, phone')
+            .in('id', userIds);
+
+        const profileMap = {};
+        if (profiles) {
+            profiles.forEach(p => profileMap[p.id] = { username: p.username, phone: p.phone });
+        }
+
+        adoptionList.innerHTML = '';
+        adoptions.forEach(adoption => {
+            const isOwner = currentUser && currentUser.id === adoption.user_id;
+            const card = document.createElement('div');
+            card.className = 'adoption-card';
+
+            const petEmoji = adoption.pet_type === 'Chien' ? '🐕' : '🐈';
+            const vaxIcon = adoption.vaccination_status === 'Vaccinated' ? '✅' : '❌';
+            const vaccinesText = adoption.vaccines && adoption.vaccines.length > 0
+                ? adoption.vaccines.join(', ')
+                : 'Aucun';
+            const contactPhone = profileMap[adoption.user_id]?.phone || adoption.contact_phone;
+
+            card.innerHTML = `
+                ${adoption.image_url ? `<img src="${adoption.image_url}" class="adoption-image" alt="${adoption.pet_name}" />` : `<div class="adoption-image-placeholder">${petEmoji}</div>`}
+                <div class="adoption-content">
+                    <div class="adoption-header">
+                        <span class="adoption-pet-name">${petEmoji} ${adoption.pet_name}</span>
+                        ${isOwner ? `<div class="adoption-actions"><button class="adoption-delete-btn" data-id="${adoption.id}">Supprimer</button></div>` : ''}
+                    </div>
+                    <p class="adoption-info"><strong>Type:</strong> ${adoption.pet_type}</p>
+                    <p class="adoption-info"><strong>Âge:</strong> ${adoption.pet_age} an(s)</p>
+                    <p class="adoption-info"><strong>Vacciné:</strong> ${vaxIcon} ${adoption.vaccination_status === 'Vaccinated' ? 'Oui' : 'Non'}</p>
+                    ${adoption.vaccines && adoption.vaccines.length > 0 ? `<p class="adoption-info"><strong>Vaccins:</strong> ${vaccinesText}</p>` : ''}
+                    ${contactPhone ? `<p class="adoption-info"><strong>Contact:</strong> <a href="tel:${contactPhone}">${contactPhone}</a></p>` : ''}
+                    <p class="adoption-info"><strong>Proposé par:</strong> ${profileMap[adoption.user_id]?.username || 'Utilisateur'}</p>
+                </div>
+            `;
+            adoptionList.appendChild(card);
+        });
+
+        document.querySelectorAll('.adoption-delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if (!confirm('Supprimer cette annonce?')) return;
+                const id = e.target.dataset.id;
+                const { data: adoption } = await supabaseClient.from('adoptions').select('image_url').eq('id', id).single();
+                if (adoption?.image_url) {
+                    const fileName = adoption.image_url.split('/adoption-images/')[1];
+                    if (fileName) await supabaseClient.storage.from('adoption-images').remove([fileName]);
+                }
+                await supabaseClient.from('adoptions').delete().eq('id', id);
+                loadAdoptions();
             });
-        } else {
-            dogVax.forEach(el => el.classList.add('hidden'));
-            catVax.forEach(el => el.classList.remove('hidden'));
-             dogVax.forEach(el => {
-                const cb = el.querySelector('input');
-                if(cb) cb.checked = false;
-            });
-        }
-    });
-
-    // --- Form Submission ---
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        // Get values
-        const name = document.getElementById('petName').value;
-        const age = document.getElementById('petAge').value;
-        const type = document.getElementById('petType').value;
-        const phone = document.getElementById('contactPhone').value;
-        const vaxStatus = document.querySelector('input[name="vaxStatus"]:checked').value;
-        const fileInput = document.getElementById('petImage');
-
-        // Get selected vaccines
-        const selectedVaccines = [];
-        if (vaxStatus === 'Vaccinated') {
-            document.querySelectorAll('input[name="vaccines"]:checked').forEach(cb => {
-                selectedVaccines.push(cb.value);
-            });
-        }
-
-        try {
-            // Image Handling
-            let imageUrl = 'assets/icons/default-pet.svg'; // Fallback
-            if (fileInput.files[0]) {
-                imageUrl = await toBase64(fileInput.files[0]);
-            }
-
-            const newAdoption = {
-                id: Date.now(),
-                name,
-                age,
-                type,
-                phone,
-                vaxStatus,
-                selectedVaccines,
-                imageUrl
-            };
-
-            // Save and Render
-            saveAdoption(newAdoption);
-            renderAdoption(newAdoption);
-
-            // Reset and Hide
-            form.reset();
-            vaccineListContainer.classList.add('hidden');
-            document.getElementById('contactPhone').value = "+216"; 
-            toggleForm();
-
-        } catch (error) {
-            console.error("Error processing adoption", error);
-            alert("Failed to process image. It might be too large.");
-        }
-    });
-
-    function saveAdoption(item) {
-        const adoptions = JSON.parse(localStorage.getItem('adoptions') || '[]');
-        adoptions.unshift(item); // Newest first
-        
-        // Limit to 20
-        if (adoptions.length > 20) adoptions.pop();
-
-        try {
-            localStorage.setItem('adoptions', JSON.stringify(adoptions));
-        } catch (e) {
-            alert("Storage full! Oldest listings will be removed.");
-             while (adoptions.length > 0) {
-                adoptions.pop();
-                try {
-                    localStorage.setItem('adoptions', JSON.stringify(adoptions));
-                    break;
-                } catch (e) { continue; }
-            }
-        }
-    }
-
-    function loadAdoptions() {
-        const adoptions = JSON.parse(localStorage.getItem('adoptions') || '[]');
-        list.innerHTML = ''; // Clear current
-        adoptions.forEach(item => {
-            renderAdoption(item, true); // Append to end since sorted by date
         });
     }
 
-    function clearAdoptions() {
-        localStorage.removeItem('adoptions');
-        list.innerHTML = '';
-    }
-
-    function renderAdoption(item, appendToEnd = false) {
-        // Construct Vaccine Display Text
-        let vaxDisplay = `<span style="color: #e74c3c;">Non vacciné</span>`;
-        if (item.vaxStatus === 'Vaccinated') {
-            if (item.selectedVaccines && item.selectedVaccines.length > 0) {
-                vaxDisplay = `<span style="color: #27ae60;">Vacciné:</span> <br> <small>${item.selectedVaccines.join(', ')}</small>`;
-            } else {
-                vaxDisplay = `<span style="color: #27ae60;">Vacciné</span> (Non spécifié)`;
-            }
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+            updateAuthButton(session.user, null);
+        } else if (event === 'SIGNED_OUT') {
+            updateAuthButton(null, null);
         }
-
-        // Create Card
-        const card = document.createElement('article');
-        card.className = 'card';
-
-        card.innerHTML = `
-            <img src="${item.imageUrl}" alt=" " class="adoption-image" style="height: 200px; object-fit: cover;">
-            <h3 style="margin-bottom:0.5rem; color: var(--primary-color);">${item.name}</h3>
-            <div style="font-size: 0.95rem; line-height: 1.6;">
-                <p><strong>Type:</strong> ${item.type}</p>
-                <p><strong>Âge:</strong> ${item.age} ans</p>
-                <p style="margin-top: 0.5rem; background: var(--bg-color); padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <strong>Statut:</strong> ${vaxDisplay}
-                </p>
-            </div>
-            <a href="tel:${item.phone}" class="btn" style="margin-top: 1rem; width: 100%; text-decoration: none;">
-                📞 Contacter le propriétaire
-            </a>
-        `;
-
-        if (appendToEnd) {
-            list.appendChild(card);
-        } else {
-            list.prepend(card);
-        }
-    }
-
-    const toBase64 = file => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
     });
+}
 
-    window.clearAdoptions = clearAdoptions;
-});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initAdoptionApp());
+} else {
+    initAdoptionApp();
+}
