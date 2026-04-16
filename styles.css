@@ -418,8 +418,17 @@ footer {
 }
 
 .post-caption {
-  margin-top: 0.5rem;
   font-size: 0.95rem;
+  flex: 1;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 /* ── Responsive ───────────────────────────────────────────────── */
@@ -744,7 +753,7 @@ footer {
     padding: 0.4rem 1rem;
     border: none;
     border-radius: 6px;
-    font-size: 0.85rem;
+    font-size: 2rem;
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s ease;
@@ -752,7 +761,7 @@ footer {
 }
 
 .post-edit-btn {
-    background: var(--primary-color);
+    background: var(--bg-color);
     color: white;
 }
 
@@ -761,7 +770,7 @@ footer {
 }
 
 .post-delete-btn {
-    background: #e74c3c;
+    background: var(--bg-color);
     color: white;
 }
 

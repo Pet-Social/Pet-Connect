@@ -329,11 +329,13 @@ async function initApp() {
             div.innerHTML = `
                 <div class="post-header">
                     <span class="post-owner">${post.profiles?.username || 'Utilisateur'}</span>
-                    ${isOwner ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">Supprimer</button><button class="post-edit-btn" data-id="' + post.id + '" data-caption="' + encodeURIComponent(post.caption || '') + '">Modifier</button></div>' : ''}
                     <div class="post-date">${new Date(post.created_at).toLocaleDateString()}</div>
                 </div>
                 <img src="${post.image_url}" class="post-image" alt="Post" />
-                <div class="post-caption">${post.caption || ''}</div>
+                <div class="post-footer">
+                    <span class="post-caption">${post.caption || ''}</span>
+                    ${isOwner ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">🗑️</button><button class="post-edit-btn" data-id="' + post.id + '" data-caption="' + encodeURIComponent(post.caption || '') + '">✍️</button></div>' : ''}
+                </div>
             `;
             postsContainer.appendChild(div);
         });
