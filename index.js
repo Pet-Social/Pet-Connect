@@ -152,6 +152,44 @@ async function initApp() {
         });
     }
     if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+    const closeEditBtn = document.getElementById('closeEditPostModal');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const deletePostFromModalBtn = document.getElementById('deletePostBtn');
+    const editPostForm = document.getElementById('editPostForm');
+    const editModal = document.getElementById('editPostModal');
+
+    if (closeEditBtn) {
+        closeEditBtn.addEventListener('click', closeEditModal);
+    }
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', closeEditModal);
+    }
+    if (editModal) {
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) closeEditModal();
+        });
+    }
+    if (deletePostFromModalBtn) {
+        deletePostFromModalBtn.addEventListener('click', async () => {
+            if (!confirm('Supprimer ce post?')) return;
+            if (currentEditPostId) {
+                await supabaseClient.from('posts').delete().eq('id', currentEditPostId);
+                closeEditModal();
+                loadPosts();
+            }
+        });
+    }
+    if (editPostForm) {
+        editPostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentEditPostId) return;
+            const newCaption = document.getElementById('editPostCaption').value;
+            await supabaseClient.from('posts').update({ caption: newCaption }).eq('id', currentEditPostId);
+            closeEditModal();
+            loadPosts();
+        });
+    }
     
     // Tab switching
     if (loginTab) {
@@ -291,7 +329,7 @@ async function initApp() {
             div.innerHTML = `
                 <div class="post-header">
                     <span class="post-owner">${post.profiles?.username || 'Utilisateur'}</span>
-                    ${isOwner ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">Supprimer</button></div>' : ''}
+                    ${isOwner ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">Supprimer</button><button class="post-edit-btn" data-id="' + post.id + '" data-caption="' + encodeURIComponent(post.caption || '') + '">Modifier</button></div>' : ''}
                     <div class="post-date">${new Date(post.created_at).toLocaleDateString()}</div>
                 </div>
                 <img src="${post.image_url}" class="post-image" alt="Post" />
@@ -308,6 +346,30 @@ async function initApp() {
                 loadPosts();
             });
         });
+
+        document.querySelectorAll('.post-edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                const caption = decodeURIComponent(e.target.dataset.caption);
+                openEditModal(id, caption);
+            });
+        });
+    }
+
+    let currentEditPostId = null;
+
+    function openEditModal(postId, caption) {
+        currentEditPostId = postId;
+        const editModal = document.getElementById('editPostModal');
+        const captionInput = document.getElementById('editPostCaption');
+        if (captionInput) captionInput.value = caption;
+        if (editModal) editModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        const editModal = document.getElementById('editPostModal');
+        if (editModal) editModal.classList.add('hidden');
+        currentEditPostId = null;
     }
     
     // Check session and load initial data
