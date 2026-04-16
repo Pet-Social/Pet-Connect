@@ -134,6 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(`${product.name} ajouté au panier !`);
     }
 
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function escapeAttr(text) {
+        if (!text) return '';
+        return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function removeFromCart(productName) {
         cart = cart.filter(item => item.name !== productName);
         saveCart();
@@ -176,26 +188,26 @@ document.addEventListener('DOMContentLoaded', () => {
             cartItemsContainer.innerHTML = cart.map(item => `
                 <div class="cart-item">
                     <div class="cart-item-info">
-                        <span class="cart-item-name">${item.name}</span>
-                        <span class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+                        <span class="cart-item-name">${escapeHtml(item.name)}</span>
+                        <span class="cart-item-price">${(item.price * item.quantity).toFixed(2)} TND</span>
                     </div>
                     <div class="cart-item-controls">
-                        <button class="quantity-btn" onclick="updateQuantity('${item.name}', -1)">-</button>
+                        <button class="quantity-btn" onclick="updateQuantity('${escapeAttr(item.name)}', -1)">-</button>
                         <span>${item.quantity}</span>
-                        <button class="quantity-btn" onclick="updateQuantity('${item.name}', 1)">+</button>
-                        <button class="remove-btn" onclick="removeFromCart('${item.name}')">&times;</button>
+                        <button class="quantity-btn" onclick="updateQuantity('${escapeAttr(item.name)}', 1)">+</button>
+                        <button class="remove-btn" onclick="removeFromCart('${escapeAttr(item.name)}')">&times;</button>
                     </div>
                 </div>
             `).join('');
             
-            cartTotalContainer.innerHTML = `<div class="cart-total">Total: $${calculateTotal().toFixed(2)}</div>`;
+            cartTotalContainer.innerHTML = `<div class="cart-total">Total: ${calculateTotal().toFixed(2)} TND</div>`;
             confirmOrderBtn.style.display = 'block';
         }
     }
 
     function confirmOrder() {
         if (cart.length === 0) return;
-        alert(`Commande confirmée ! Total : $${calculateTotal().toFixed(2)}`);
+        alert(`Commande confirmée ! Total : ${calculateTotal().toFixed(2)} TND`);
         cart = [];
         saveCart();
         updateCartCount();
@@ -233,15 +245,25 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredProducts.forEach(product => {
             const card = document.createElement('article');
             card.className = 'card';
+            const safeProduct = {
+                name: escapeHtml(product.name),
+                category: escapeHtml(product.category),
+                price: product.price,
+                image: escapeAttr(product.image)
+            };
             card.innerHTML = `
                 <div class="product-images-container">
-                    <img src="${product.image}" alt="${product.name}" class="product-image" style="height: 200px; object-fit: contain; padding: 1rem; background: #f9f9f9;">
+                    <img src="${safeProduct.image}" alt="${safeProduct.name}" class="product-image" style="height: 200px; object-fit: contain; padding: 1rem; background: #f9f9f9;" loading="lazy">
                 </div>
-                <h3>${product.name}</h3>
-                <p style="color: #666; font-size: 0.9rem;">${product.category}</p>
-                <div class="product-price">$${product.price.toFixed(2)}</div>
-                <button class="btn" style="width: 100%;" onclick='addToCart(${JSON.stringify(product).replace(/'/g, "\\'")})'>Add to Cart</button>
+                <h3>${safeProduct.name}</h3>
+                <p style="color: #666; font-size: 0.9rem;">${safeProduct.category}</p>
+                <div class="product-price">${product.price.toFixed(2)} TND</div>
+                <button class="btn" style="width: 100%;" data-product="${escapeAttr(JSON.stringify(product))}">Ajouter au panier</button>
             `;
+            
+            const btn = card.querySelector('button');
+            btn.addEventListener('click', () => addToCart(product));
+            
             shopGrid.appendChild(card);
         });
     }

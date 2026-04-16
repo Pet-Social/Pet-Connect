@@ -42,6 +42,18 @@ async function initAdoptionApp() {
         });
     }
 
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function escapeAttr(text) {
+        if (!text) return '';
+        return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function getInitials(username) {
         if (!username) return 'U';
         const parts = username.trim().split(/\s+/);
@@ -374,10 +386,23 @@ async function initAdoptionApp() {
             const vaccines = Array.from(document.querySelectorAll('input[name="vaccines"]:checked')).map(cb => cb.value);
             const imageFile = document.getElementById('petImage').files[0];
 
+            const submitBtn = adoptionForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Publication...';
+
             let imageUrl = null;
             if (imageFile) {
                 const fileName = `adoptions/${currentUser.id}/${Date.now()}.${imageFile.name.split('.').pop()}`;
-                await supabaseClient.storage.from('adoption-images').upload(fileName, imageFile);
+                const { error: uploadError } = await supabaseClient.storage.from('adoption-images').upload(fileName, imageFile);
+                
+                if (uploadError) {
+                    console.error('Upload error:', uploadError);
+                    alert('Erreur lors de l\'upload de l\'image');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Publier';
+                    return;
+                }
+                
                 const { data: urlData } = supabaseClient.storage.from('adoption-images').getPublicUrl(fileName);
                 imageUrl = urlData.publicUrl;
             }
@@ -392,6 +417,9 @@ async function initAdoptionApp() {
                 vaccines: vaccines,
                 image_url: imageUrl
             }]);
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Publier';
 
             if (error) {
                 alert('Erreur: ' + error.message);
@@ -479,20 +507,23 @@ async function initAdoptionApp() {
                 ? adoption.vaccines.join(', ')
                 : 'Aucun';
             const contactPhone = profileMap[adoption.user_id]?.phone || adoption.contact_phone;
+            const petName = escapeHtml(adoption.pet_name);
+            const ownerName = escapeHtml(profileMap[adoption.user_id]?.username) || 'Utilisateur';
 
             card.innerHTML = `
-                ${adoption.image_url ? `<img src="${adoption.image_url}" class="adoption-image" alt="${adoption.pet_name}" />` : `<div class="adoption-image-placeholder">${petEmoji}</div>`}
+                ${adoption.image_url ? `<img src="${adoption.image_url}" class="adoption-image" alt="${petName}" loading="lazy" />` : `<div class="adoption-image-placeholder">${petEmoji}</div>`}
                 <div class="adoption-content">
                     <div class="adoption-header">
-                        <span class="adoption-pet-name">${petEmoji} ${adoption.pet_name}</span>
+                        <span class="adoption-pet-name">${petEmoji} ${petName}</span>
                         ${isOwner ? `<div class="adoption-actions"><button class="adoption-delete-btn" data-id="${adoption.id}">Supprimer</button></div>` : ''}
                     </div>
-                    <p class="adoption-info"><strong>Type:</strong> ${adoption.pet_type}</p>
-                    <p class="adoption-info"><strong>Âge:</strong> ${adoption.pet_age} an(s)</p>
+                    <p class="adoption-info"><strong>Type:</strong> ${escapeHtml(adoption.pet_type)}</p>
+                    <p class="adoption-info"><strong>Âge:</strong> ${escapeHtml(adoption.pet_age)} an(s)</p>
                     <p class="adoption-info"><strong>Vacciné:</strong> ${vaxIcon} ${adoption.vaccination_status === 'Vaccinated' ? 'Oui' : 'Non'}</p>
-                    ${adoption.vaccines && adoption.vaccines.length > 0 ? `<p class="adoption-info"><strong>Vaccins:</strong> ${vaccinesText}</p>` : ''}
-                    ${contactPhone ? `<p class="adoption-info"><strong>Contact:</strong> <a href="tel:${contactPhone}">${contactPhone}</a></p>` : ''}
-                    <p class="adoption-info"><strong>Proposé par:</strong> ${profileMap[adoption.user_id]?.username || 'Utilisateur'}</p>
+                    ${adoption.vaccines && adoption.vaccines.length > 0 ? `<p class="adoption-info"><strong>Vaccins:</strong> ${escapeHtml(vaccinesText)}</p>` : ''}
+                    ${contactPhone ? `<p class="adoption-info"><strong>Contact:</strong> <a href="tel:${escapeAttr(contactPhone)}">${escapeHtml(contactPhone)}</a></p>` : ''}
+                    <p class="adoption-info"><strong>Proposé par:</strong> ${ownerName}</p>
+                    <p class="adoption-info"><strong>Date:</strong> ${new Date(adoption.created_at).toLocaleDateString('fr-FR')}</p>
                 </div>
             `;
             adoptionList.appendChild(card);

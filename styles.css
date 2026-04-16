@@ -884,7 +884,7 @@ footer {
 .shop-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4rem;
+  gap: 1.5rem;
   margin-top: 1.5rem;
 }
 
