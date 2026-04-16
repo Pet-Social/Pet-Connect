@@ -178,7 +178,19 @@ header {
   color: var(--text-color);
   transition: 0.2s ease;
 }
-
+.form-control::file-selector-button{
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+.form-control::file-selector-button:hover {
+  background: var(--primary-hover);
+}
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
