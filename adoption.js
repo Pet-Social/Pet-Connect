@@ -166,13 +166,51 @@ async function initAdoptionApp() {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) {
-                alert('Erreur de connexion: ' + error.message);
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            
+            if (!email || !password) {
+                alert('Veuillez remplir tous les champs');
                 return;
             }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Chargement...';
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Se connecter';
+            
+            if (error) {
+                console.error('Login error:', error);
+                if (error.message.includes('Invalid login credentials')) {
+                    alert('Email ou mot de passe incorrect');
+                } else if (error.message.includes('Email not confirmed')) {
+                    alert('Veuillez confirmer votre email');
+                } else {
+                    alert('Erreur de connexion: ' + error.message);
+                }
+                return;
+            }
+            
+            if (data.user) {
+                const { data: profile } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+                
+                if (!profile) {
+                    const username = data.user.user_metadata?.full_name || 'User';
+                    const phone = data.user.user_metadata?.phone || '';
+                    await supabaseClient
+                        .from('profiles')
+                        .insert([{ id: data.user.id, username, phone }]);
+                }
+            }
+            
             location.reload();
         });
     }
@@ -180,21 +218,43 @@ async function initAdoptionApp() {
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('signupName').value;
-            const phone = document.getElementById('signupPhone').value;
-            const email = document.getElementById('signupEmail').value;
+            const name = document.getElementById('signupName').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
-            const { data, error } = await supabaseClient.auth.signUp({
-                email, password,
-                options: { data: { full_name: name } }
-            });
-            if (error) {
-                alert('Erreur d\'inscription: ' + error.message);
+            const submitBtn = signupForm.querySelector('button[type="submit"]');
+            
+            if (!name || !email || !password) {
+                alert('Veuillez remplir tous les champs obligatoires');
                 return;
             }
-            if (data.user) {
-                await createProfile(data.user.id, name, phone);
+            
+            if (password.length < 6) {
+                alert('Le mot de passe doit contenir au moins 6 caractères');
+                return;
             }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Chargement...';
+            
+            const { data, error } = await supabaseClient.auth.signUp({
+                email, password,
+                options: { data: { full_name: name, phone } }
+            });
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = "S'inscrire";
+            
+            if (error) {
+                console.error('Signup error:', error);
+                if (error.message.includes('already registered')) {
+                    alert('Cet email est déjà utilisé');
+                } else {
+                    alert('Erreur d\'inscription: ' + error.message);
+                }
+                return;
+            }
+            
             location.reload();
         });
     }
@@ -207,16 +267,50 @@ async function initAdoptionApp() {
             const newEmail = document.getElementById('profileEmailInput').value.trim();
             const newPhone = document.getElementById('profilePhone').value.trim();
             const newPassword = document.getElementById('profilePassword').value;
-            if (newEmail !== currentUser.email) {
-                await supabaseClient.auth.updateUser({ email: newEmail });
+            const submitBtn = profileForm.querySelector('button[type="submit"]');
+            
+            if (!newUsername) {
+                alert('Le nom d\'utilisateur est requis');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Chargement...';
+            
+            let updatePromises = [];
+            
+            if (newEmail && newEmail !== currentUser.email) {
+                updatePromises.push(supabaseClient.auth.updateUser({ email: newEmail }));
             }
             if (newPassword) {
-                await supabaseClient.auth.updateUser({ password: newPassword });
+                if (newPassword.length < 6) {
+                    alert('Le mot de passe doit contenir au moins 6 caractères');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Mettre à jour';
+                    return;
+                }
+                updatePromises.push(supabaseClient.auth.updateUser({ password: newPassword }));
             }
-            await supabaseClient
-                .from('profiles')
-                .update({ username: newUsername, phone: newPhone })
-                .eq('id', currentUser.id);
+            
+            updatePromises.push(
+                supabaseClient
+                    .from('profiles')
+                    .update({ username: newUsername, phone: newPhone })
+                    .eq('id', currentUser.id)
+            );
+            
+            const results = await Promise.allSettled(updatePromises);
+            const errors = results.filter(r => r.status === 'rejected' || r.value?.error);
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Mettre à jour';
+            
+            if (errors.length > 0) {
+                console.error('Update errors:', errors);
+                alert('Erreur lors de la mise à jour du profil');
+                return;
+            }
+            
             alert('Profil mis à jour!');
             location.reload();
         });
