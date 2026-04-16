@@ -110,6 +110,10 @@
                 <button class="auth-tab active" id="loginTab">Connexion</button>
                 <button class="auth-tab" id="signupTab">Inscription</button>
             </div>
+            <div id="authError" class="auth-error hidden">
+                <span id="authErrorText"></span>
+                <button type="button" class="auth-error-close" onclick="document.getElementById('authError').classList.add('hidden')">&times;</button>
+            </div>
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
                     <label for="loginEmail">Email</label>

@@ -219,17 +219,89 @@ async function initApp() {
         });
     }
     
+    // Helper function to show error
+    function showAuthError(message) {
+        const errorDiv = document.getElementById('authError');
+        const errorText = document.getElementById('authErrorText');
+        if (errorDiv) {
+            if (errorText) errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+        } else {
+            alert(message);
+        }
+    }
+    
+    // Helper function to hide error
+    function hideAuthError() {
+        const errorDiv = document.getElementById('authError');
+        if (errorDiv) {
+            errorDiv.classList.add('hidden');
+        }
+    }
+    
+    // Helper function to set loading state on buttons
+    function setAuthLoading(button, loading) {
+        if (!button) return;
+        if (loading) {
+            button.disabled = true;
+            button.dataset.originalText = button.textContent;
+            button.textContent = 'Chargement...';
+        } else {
+            button.disabled = false;
+            button.textContent = button.dataset.originalText || button.textContent;
+        }
+    }
+    
     // Login form
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
+            hideAuthError();
+            
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            
+            if (!email || !password) {
+                showAuthError('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            setAuthLoading(submitBtn, true);
             
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            
+            setAuthLoading(submitBtn, false);
+            
             if (error) {
-                alert('Erreur de connexion: ' + error.message);
+                console.error('Login error:', error);
+                if (error.message.includes('Invalid login credentials')) {
+                    showAuthError('Email ou mot de passe incorrect');
+                } else if (error.message.includes('Email not confirmed')) {
+                    showAuthError('Veuillez confirmer votre email');
+                } else {
+                    showAuthError('Erreur de connexion: ' + error.message);
+                }
                 return;
+            }
+            
+            if (data.user) {
+                const { data: profile } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+                
+                if (!profile) {
+                    const username = data.user.user_metadata?.full_name || 'User';
+                    const { error: profileError } = await supabaseClient
+                        .from('profiles')
+                        .insert([{ id: data.user.id, username }]);
+                    
+                    if (profileError) {
+                        console.error('Profile creation error:', profileError);
+                    }
+                }
             }
             
             localStorage.setItem('justLoggedIn', 'true');
@@ -241,23 +313,42 @@ async function initApp() {
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('signupName').value;
-            const phone = document.getElementById('signupPhone').value;
-            const email = document.getElementById('signupEmail').value;
+            hideAuthError();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
+            const submitBtn = signupForm.querySelector('button[type="submit"]');
+            
+            if (!name || !email || !password) {
+                showAuthError('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAuthError('Le mot de passe doit contenir au moins 6 caractères');
+                return;
+            }
+            
+            setAuthLoading(submitBtn, true);
             
             const { data, error } = await supabaseClient.auth.signUp({
                 email,
                 password,
-                options: { data: { full_name: name } }
+                options: { data: { full_name: name, phone } }
             });
-            if (error) {
-                alert('Erreur d\'inscription: ' + error.message);
-                return;
-            }
             
-            if (data.user) {
-                await createProfile(data.user.id, name, phone);
+            setAuthLoading(submitBtn, false);
+            
+            if (error) {
+                console.error('Signup error:', error);
+                if (error.message.includes('already registered')) {
+                    showAuthError('Cet email est déjà utilisé');
+                } else {
+                    showAuthError('Erreur d\'inscription: ' + error.message);
+                }
+                return;
             }
             
             localStorage.setItem('justLoggedIn', 'true');
@@ -275,16 +366,45 @@ async function initApp() {
             const newPhone = document.getElementById('profilePhone').value.trim();
             const newPassword = document.getElementById('profilePassword').value;
             
-            if (newEmail !== currentUser.email) {
-                await supabaseClient.auth.updateUser({ email: newEmail });
+            if (!newUsername) {
+                alert('Le nom d\'utilisateur est requis');
+                return;
+            }
+            
+            const submitBtn = profileForm.querySelector('button[type="submit"]');
+            setAuthLoading(submitBtn, true);
+            
+            let updatePromises = [];
+            
+            if (newEmail && newEmail !== currentUser.email) {
+                updatePromises.push(supabaseClient.auth.updateUser({ email: newEmail }));
             }
             if (newPassword) {
-                await supabaseClient.auth.updateUser({ password: newPassword });
+                if (newPassword.length < 6) {
+                    alert('Le mot de passe doit contenir au moins 6 caractères');
+                    setAuthLoading(submitBtn, false);
+                    return;
+                }
+                updatePromises.push(supabaseClient.auth.updateUser({ password: newPassword }));
             }
-            await supabaseClient
-                .from('profiles')
-                .update({ username: newUsername, phone: newPhone })
-                .eq('id', currentUser.id);
+            
+            updatePromises.push(
+                supabaseClient
+                    .from('profiles')
+                    .update({ username: newUsername, phone: newPhone })
+                    .eq('id', currentUser.id)
+            );
+            
+            const results = await Promise.allSettled(updatePromises);
+            const errors = results.filter(r => r.status === 'rejected' || r.value?.error);
+            
+            setAuthLoading(submitBtn, false);
+            
+            if (errors.length > 0) {
+                console.error('Update errors:', errors);
+                alert('Erreur lors de la mise à jour du profil');
+                return;
+            }
             
             alert('Profil mis à jour!');
             location.reload();
@@ -439,6 +559,14 @@ async function initApp() {
             if (loginPrompt) loginPrompt.classList.add('hidden');
             if (toggleBtn) toggleBtn.classList.add('hidden');
             if (postsContainer) postsContainer.classList.add('hidden');
+        });
+    }
+    
+    const promptLoginBtn = document.getElementById('promptLoginBtn');
+    if (promptLoginBtn) {
+        promptLoginBtn.addEventListener('click', () => {
+            closeProfileModal();
+            openAuthModal();
         });
     }
     
