@@ -36,6 +36,11 @@ async function initApp() {
     if (themeIcon) {
         themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
     }
+
+    // Avoid initial background transition on reload; enable transitions after first paint.
+    requestAnimationFrame(() => {
+        document.body.classList.add('theme-ready');
+    });
     
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {

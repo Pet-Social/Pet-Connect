@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pet Connect - Boutique</title>
+    <script>
+        (function () {
+            try {
+                var savedTheme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+        <style>
+            html[data-theme='dark'],
+            html[data-theme='dark'] body {
+                background: #121212;
+            }
+
+            html[data-theme='light'],
+            html[data-theme='light'] body {
+                background: #f8f9fa;
+            }
+        </style>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>

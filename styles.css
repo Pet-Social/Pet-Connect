@@ -1,5 +1,6 @@
 html {
   height: 100%;
+  background: var(--bg-color);
 }
 
 main {
@@ -57,12 +58,16 @@ body {
   line-height: 1.6;
   color: var(--text-color);
   background: var(--bg-color);
-  transition:
-    background 0.3s ease,
-    color 0.3s ease;
+  transition: none;
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+body.theme-ready {
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 a {
