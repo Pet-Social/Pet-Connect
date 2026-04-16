@@ -700,6 +700,100 @@ footer {
     transform: scale(1.05);
 }
 
+/* Admin Badge */
+.admin-badge {
+    background: #e74c3c;
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-left: 6px;
+    text-transform: uppercase;
+}
+
+[data-theme='dark'] .admin-badge {
+    background: #c0392b;
+}
+
+/* Admin Panel */
+#admin-panel {
+    background: var(--card-bg);
+    border: 2px dashed #e74c3c;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin-header h3 {
+    color: #e74c3c;
+    margin: 0;
+}
+
+.admin-form {
+    background: var(--bg-color);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin-top: 1rem;
+}
+
+.admin-form h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.admin-form.hidden {
+    display: none;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.product-actions .btn {
+    flex: 1;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-small {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #7f8c8d;
+}
+
 /* Profile Modal Styles */
 .profile-modal {
     width: 100%;

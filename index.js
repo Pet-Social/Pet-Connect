@@ -3,6 +3,7 @@ import { supabaseUrl, supabaseKey } from './config.js';
 let supabaseClient = null;
 let currentUser = null;
 let currentProfile = null;
+let isAdmin = false;
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -68,6 +69,7 @@ async function initApp() {
             if (session) {
                 currentUser = session.user;
                 currentProfile = await loadProfile(session.user.id);
+                isAdmin = currentProfile?.is_admin || false;
                 updateAuthButton(session.user, currentProfile);
                 openProfileModal();
             } else {
@@ -93,9 +95,17 @@ async function initApp() {
         const avatar = document.getElementById('profileAvatar');
         const uname = document.getElementById('profileUsername');
         const email = document.getElementById('profileEmail');
+        const adminStatus = document.getElementById('adminStatus');
         if (avatar) avatar.textContent = getInitials(username);
         if (uname) uname.textContent = username;
         if (email) email.textContent = currentUser.email;
+        if (adminStatus) {
+            if (isAdmin) {
+                adminStatus.classList.remove('hidden');
+            } else {
+                adminStatus.classList.add('hidden');
+            }
+        }
         if (profileModal) profileModal.classList.remove('hidden');
     }
     
@@ -456,13 +466,13 @@ async function initApp() {
             const isOwner = currentUser && currentUser.id === post.user_id;
             div.innerHTML = `
                 <div class="post-header">
-                    <span class="post-owner">${escapeHtml(post.profiles?.username) || 'Utilisateur'}</span>
+                    <span class="post-owner">${escapeHtml(post.profiles?.username) || 'Utilisateur'}${isAdmin ? ' <span class="admin-badge">Admin</span>' : ''}</span>
                     <div class="post-date">${new Date(post.created_at).toLocaleDateString('fr-FR')}</div>
                 </div>
                 <img src="${post.image_url}" class="post-image" alt="Post" loading="lazy" />
                 <div class="post-footer">
                     <span class="post-caption">${escapeHtml(post.caption)}</span>
-                    ${isOwner ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">🗑️</button><button class="post-edit-btn" data-id="' + post.id + '" data-caption="' + encodeURIComponent(post.caption || '') + '">✍️</button></div>' : ''}
+                    ${(isOwner || isAdmin) ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">🗑️</button><button class="post-edit-btn" data-id="' + post.id + '" data-caption="' + encodeURIComponent(post.caption || '') + '">✍️</button></div>' : ''}
                 </div>
             `;
             postsContainer.appendChild(div);
@@ -513,6 +523,7 @@ async function initApp() {
         if (session) {
             currentUser = session.user;
             currentProfile = await loadProfile(session.user.id);
+            isAdmin = currentProfile?.is_admin || false;
             updateAuthButton(session.user, currentProfile);
             
             if (localStorage.getItem('justLoggedIn') === 'true') {
@@ -526,6 +537,7 @@ async function initApp() {
             }
         } else {
             updateAuthButton(null, null);
+            isAdmin = false;
         }
         loadPosts();
     }

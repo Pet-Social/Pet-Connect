@@ -3,6 +3,7 @@ import { supabaseUrl, supabaseKey } from './config.js';
 let supabaseClient = null;
 let currentUser = null;
 let currentProfile = null;
+let isAdmin = false;
 
 async function initAdoptionApp() {
     if (!window.supabase) {
@@ -136,6 +137,7 @@ async function initAdoptionApp() {
             if (session) {
                 currentUser = session.user;
                 currentProfile = await loadProfile(session.user.id);
+                isAdmin = currentProfile?.is_admin || false;
                 updateAuthButton(session.user, currentProfile);
                 openProfileModal();
             } else {
@@ -333,9 +335,11 @@ async function initAdoptionApp() {
         if (session) {
             currentUser = session.user;
             currentProfile = await loadProfile(session.user.id);
+            isAdmin = currentProfile?.is_admin || false;
             updateAuthButton(session.user, currentProfile);
         } else {
             updateAuthButton(null, null);
+            isAdmin = false;
         }
         loadAdoptions();
     }
@@ -515,14 +519,14 @@ async function initAdoptionApp() {
                 <div class="adoption-content">
                     <div class="adoption-header">
                         <span class="adoption-pet-name">${petEmoji} ${petName}</span>
-                        ${isOwner ? `<div class="adoption-actions"><button class="adoption-delete-btn" data-id="${adoption.id}">Supprimer</button></div>` : ''}
+                        ${(isOwner || isAdmin) ? `<div class="adoption-actions"><button class="adoption-delete-btn" data-id="${adoption.id}">🗑️ Supprimer</button></div>` : ''}
                     </div>
+                    ${isAdmin ? `<p class="adoption-info"><strong>Par:</strong> ${ownerName} <span class="admin-badge">Admin</span></p>` : `<p class="adoption-info"><strong>Par:</strong> ${ownerName}</p>`}
                     <p class="adoption-info"><strong>Type:</strong> ${escapeHtml(adoption.pet_type)}</p>
                     <p class="adoption-info"><strong>Âge:</strong> ${escapeHtml(adoption.pet_age)} an(s)</p>
                     <p class="adoption-info"><strong>Vacciné:</strong> ${vaxIcon} ${adoption.vaccination_status === 'Vaccinated' ? 'Oui' : 'Non'}</p>
                     ${adoption.vaccines && adoption.vaccines.length > 0 ? `<p class="adoption-info"><strong>Vaccins:</strong> ${escapeHtml(vaccinesText)}</p>` : ''}
                     ${contactPhone ? `<p class="adoption-info"><strong>Contact:</strong> <a href="tel:${escapeAttr(contactPhone)}">${escapeHtml(contactPhone)}</a></p>` : ''}
-                    <p class="adoption-info"><strong>Proposé par:</strong> ${ownerName}</p>
                     <p class="adoption-info"><strong>Date:</strong> ${new Date(adoption.created_at).toLocaleDateString('fr-FR')}</p>
                 </div>
             `;
