@@ -187,13 +187,18 @@ async function initShop() {
         if (!currentUser) return;
         const currentQty = cartMap[productId] || 0;
         const newQty = currentQty + delta;
-        if (newQty <= 0) { await removeFromCart(productId); return; }
+        if (newQty <= 0) { 
+            await removeFromCart(productId);
+            renderCart();
+            return; 
+        }
         cartMap[productId] = newQty;
         await supabaseClient.from('cart_items').upsert(
             { user_id: currentUser.id, product_id: productId, quantity: newQty },
             { onConflict: 'user_id,product_id' }
         );
         updateCartCount();
+        renderCart();
     }
 
     function calculateTotal() {
@@ -245,8 +250,22 @@ async function initShop() {
         cartTotalContainer.innerHTML = `<div class="cart-total">Total: ${calculateTotal().toFixed(2)} TND</div>`;
         if (confirmOrderBtn) confirmOrderBtn.style.display = 'block';
         
-        document.querySelectorAll('.qty-btn').forEach(b => b.onclick = e => updateQuantity(e.target.dataset.id, parseInt(e.target.dataset.d)));
-        document.querySelectorAll('.rem-btn').forEach(b => b.onclick = e => { removeFromCart(e.target.dataset.id); renderCart(); });
+        document.querySelectorAll('.qty-btn').forEach(b => {
+            b.addEventListener('click', (e) => {
+                const btn = e.target.closest('.qty-btn');
+                if (!btn) return;
+                const id = btn.getAttribute('data-id');
+                const delta = parseInt(btn.getAttribute('data-d'));
+                updateQuantity(id, delta);
+            });
+        });
+        document.querySelectorAll('.rem-btn').forEach(b => {
+            b.addEventListener('click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                removeFromCart(id);
+                renderCart();
+            });
+        });
     }
 
     async function confirmOrder() {

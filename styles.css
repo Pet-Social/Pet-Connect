@@ -738,7 +738,26 @@ footer {
     color: #e74c3c;
     margin: 0;
 }
-
+.qty-btn, .rem-btn{
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 25px;
+  padding: 0.4rem 0.75rem;
+  transition: 0.2s ease;
+}
+.qty-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+.rem-btn:hover{
+    background-color: #c0392b;
+    color: white;
+    border-color: #c0392b;
+}
 .admin-form {
     background: var(--card-bg);
     padding: 1.5rem;
