@@ -3,6 +3,14 @@ import { supabaseUrl, supabaseKey } from './config.js';
 let supabaseClient = null;
 let currentUser = null;
 let currentProfile = null;
+let isAdmin = false;
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
 async function initApp() {
     console.log('Pet Connect initializing...');
@@ -61,6 +69,7 @@ async function initApp() {
             if (session) {
                 currentUser = session.user;
                 currentProfile = await loadProfile(session.user.id);
+                isAdmin = currentProfile?.is_admin || false;
                 updateAuthButton(session.user, currentProfile);
                 openProfileModal();
             } else {
@@ -86,9 +95,17 @@ async function initApp() {
         const avatar = document.getElementById('profileAvatar');
         const uname = document.getElementById('profileUsername');
         const email = document.getElementById('profileEmail');
+        const adminStatus = document.getElementById('adminStatus');
         if (avatar) avatar.textContent = getInitials(username);
         if (uname) uname.textContent = username;
         if (email) email.textContent = currentUser.email;
+        if (adminStatus) {
+            if (isAdmin) {
+                adminStatus.classList.remove('hidden');
+            } else {
+                adminStatus.classList.add('hidden');
+            }
+        }
         if (profileModal) profileModal.classList.remove('hidden');
     }
     
@@ -126,15 +143,6 @@ async function initApp() {
             .eq('id', userId)
             .single();
         return data || null;
-    }
-    
-    async function createProfile(userId, username, phone = null) {
-        const { data } = await supabaseClient
-            .from('profiles')
-            .insert([{ id: userId, username, phone }])
-            .select()
-            .single();
-        return data;
     }
     
     async function logout() {
@@ -458,13 +466,13 @@ async function initApp() {
             const isOwner = currentUser && currentUser.id === post.user_id;
             div.innerHTML = `
                 <div class="post-header">
-                    <span class="post-owner">${post.profiles?.username || 'Utilisateur'}</span>
-                    <div class="post-date">${new Date(post.created_at).toLocaleDateString()}</div>
+                    <span class="post-owner">${escapeHtml(post.profiles?.username) || 'Utilisateur'}${isAdmin ? ' <span class="admin-badge">Admin</span>' : ''}</span>
+                    <div class="post-date">${new Date(post.created_at).toLocaleDateString('fr-FR')}</div>
                 </div>
-                <img src="${post.image_url}" class="post-image" alt="Post" />
+                <img src="${post.image_url}" class="post-image" alt="Post" loading="lazy" />
                 <div class="post-footer">
-                    <span class="post-caption">${post.caption || ''}</span>
-                    ${isOwner ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">🗑️</button><button class="post-edit-btn" data-id="' + post.id + '" data-caption="' + encodeURIComponent(post.caption || '') + '">✍️</button></div>' : ''}
+                    <span class="post-caption">${escapeHtml(post.caption)}</span>
+                    ${(isOwner || isAdmin) ? '<div class="post-owner-actions"><button class="post-delete-btn" data-id="' + post.id + '">🗑️</button><button class="post-edit-btn" data-id="' + post.id + '" data-caption="' + encodeURIComponent(post.caption || '') + '">✍️</button></div>' : ''}
                 </div>
             `;
             postsContainer.appendChild(div);
@@ -515,6 +523,7 @@ async function initApp() {
         if (session) {
             currentUser = session.user;
             currentProfile = await loadProfile(session.user.id);
+            isAdmin = currentProfile?.is_admin || false;
             updateAuthButton(session.user, currentProfile);
             
             if (localStorage.getItem('justLoggedIn') === 'true') {
@@ -528,6 +537,7 @@ async function initApp() {
             }
         } else {
             updateAuthButton(null, null);
+            isAdmin = false;
         }
         loadPosts();
     }
@@ -565,7 +575,9 @@ async function initApp() {
     const promptLoginBtn = document.getElementById('promptLoginBtn');
     if (promptLoginBtn) {
         promptLoginBtn.addEventListener('click', () => {
-            closeProfileModal();
+            if (profileModal && !profileModal.classList.contains('hidden')) {
+                closeProfileModal();
+            }
             openAuthModal();
         });
     }
@@ -593,17 +605,40 @@ async function initApp() {
                 return;
             }
             
+            const submitBtn = postForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Publication...';
+            
             const fileName = `${currentUser.id}/${Date.now()}.${imageFile.name.split('.').pop()}`;
-            await supabaseClient.storage.from('post-images').upload(fileName, imageFile);
+            const { error: uploadError } = await supabaseClient.storage.from('post-images').upload(fileName, imageFile);
+            
+            if (uploadError) {
+                console.error('Upload error:', uploadError);
+                alert('Erreur lors de l\'upload de l\'image');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Publier le moment';
+                return;
+            }
+            
             const { data: urlData } = supabaseClient.storage.from('post-images').getPublicUrl(fileName);
             
-            await supabaseClient.from('posts').insert([{
+            const { error: insertError } = await supabaseClient.from('posts').insert([{
                 user_id: currentUser.id,
                 image_url: urlData.publicUrl,
                 caption
             }]);
             
+            if (insertError) {
+                console.error('Insert error:', insertError);
+                alert('Erreur lors de la création du post');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Publier le moment';
+                return;
+            }
+            
             postForm.reset();
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Publier le moment';
             if (postSection) postSection.classList.add('hidden');
             if (toggleBtn) toggleBtn.classList.remove('hidden');
             if (postsContainer) postsContainer.classList.remove('hidden');
