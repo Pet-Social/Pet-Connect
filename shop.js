@@ -275,29 +275,90 @@ async function initShop() {
         if (document.getElementById('admin-panel')) return;
         const div = document.createElement('div');
         div.id = 'admin-panel';
-        div.innerHTML = `<div class="admin-header"><h3>⚙️ Boutique</h3><button id="toggleAdminForm" class="btn">+ Produit</button></div>
+        div.innerHTML = `<div class="admin-header"><h3>⚙️ Administration</h3><button id="toggleAdminForm" class="btn">+ Nouveau produit</button></div>
             <form id="addProductForm" class="admin-form hidden">
-                <h4>Nouveau produit</h4>
-                <input id="productName" placeholder="Nom" required>
-                <select id="productCategory"><option>Nourriture</option><option>Jouets</option><option>Accessoires</option></select>
-                <input id="productPrice" type="number" step="0.01" placeholder="Prix" required>
-                <input id="productImage" placeholder="URL image">
-                <button type="submit" class="btn btn-primary">Ajouter</button>
-                <button type="button" id="cancelAdminForm" class="btn btn-secondary">Annuler</button>
+                <h4>Ajouter un produit</h4>
+                <div class="form-group">
+                    <label for="productName">Nom du produit</label>
+                    <input type="text" id="productName" class="form-control" placeholder="Nom du produit" required>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Catégorie</label>
+                    <select id="productCategory" class="form-control">
+                        <option value="Nourriture">Nourriture</option>
+                        <option value="Jouets">Jouets</option>
+                        <option value="Accessoires">Accessoires</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Prix (TND)</label>
+                    <input type="number" id="productPrice" class="form-control" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label for="productImage">Image du produit</label>
+                    <input type="file" id="productImage" class="form-control" accept="image/*">
+                    <p id="uploadStatus" class="status-msg"></p>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" id="cancelAdminForm" class="btn btn-secondary">Annuler</button>
+                </div>
             </form>`;
         main.insertBefore(div, main.firstChild);
-        document.getElementById('toggleAdminForm').onclick = () => document.getElementById('addProductForm').classList.toggle('hidden');
-        document.getElementById('cancelAdminForm').onclick = () => document.getElementById('addProductForm').classList.add('hidden');
-        document.getElementById('addProductForm').onsubmit = async e => {
+        
+        const form = document.getElementById('addProductForm');
+        const fileInput = document.getElementById('productImage');
+        const statusMsg = document.getElementById('uploadStatus');
+        
+        document.getElementById('toggleAdminForm').onclick = () => form.classList.toggle('hidden');
+        document.getElementById('cancelAdminForm').onclick = () => { form.classList.add('hidden'); form.reset(); };
+        
+        form.onsubmit = async e => {
             e.preventDefault();
-            const name = document.getElementById('productName').value;
+            const name = document.getElementById('productName').value.trim();
             const category = document.getElementById('productCategory').value;
             const price = parseFloat(document.getElementById('productPrice').value);
-            const image = document.getElementById('productImage').value;
-            if (!name || !price) return alert('Erreur');
-            const { error } = await supabaseClient.from('products').insert([{ name, category, price, image }]);
-            if (error) return alert(error.message);
-            document.getElementById('addProductForm').reset();
+            const imageFile = fileInput.files[0];
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            if (!name || !price) return alert('Veuillez remplir tous les champs');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Chargement...';
+            
+            let imageUrl = null;
+            
+            if (imageFile) {
+                statusMsg.textContent = 'Upload en cours...';
+                const fileName = `products/${Date.now()}.${imageFile.name.split('.').pop()}`;
+                const { error: uploadError } = await supabaseClient.storage.from('product-images').upload(fileName, imageFile);
+                
+                if (uploadError) {
+                    console.error('Upload error:', uploadError);
+                    statusMsg.textContent = 'Erreur upload';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Ajouter';
+                    return alert('Erreur lors de l\'upload: ' + uploadError.message);
+                }
+                
+                const { data: urlData } = supabaseClient.storage.from('product-images').getPublicUrl(fileName);
+                imageUrl = urlData.publicUrl;
+                statusMsg.textContent = 'Upload réussi !';
+            }
+            
+            const { error } = await supabaseClient.from('products').insert([{ name, category, price, image: imageUrl }]);
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Ajouter';
+            
+            if (error) {
+                alert('Erreur: ' + error.message);
+                return;
+            }
+            
+            form.reset();
+            statusMsg.textContent = '';
+            form.classList.add('hidden');
             await loadProducts();
             renderProducts(products);
             showToast('Produit ajouté !');
