@@ -738,21 +738,68 @@ footer {
     color: #e74c3c;
     margin: 0;
 }
-
+.qty-btn, .rem-btn{
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 25px;
+  padding: 0.4rem 0.75rem;
+  transition: 0.2s ease;
+}
+.qty-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+.rem-btn:hover{
+    background-color: #c0392b;
+    color: white;
+    border-color: #c0392b;
+}
 .admin-form {
-    background: var(--bg-color);
+    background: var(--card-bg);
     padding: 1.5rem;
     border-radius: var(--radius);
     margin-top: 1rem;
+    border: 2px dashed var(--primary-color);
 }
 
 .admin-form h4 {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
 }
 
 .admin-form.hidden {
     display: none;
+}
+
+.admin-form .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--input-bg);
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.admin-form input[type="file"] {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.admin-form select.form-control {
+    cursor: pointer;
+}
+
+.admin-form .status-msg {
+    font-size: 0.875rem;
+    color: var(--primary-color);
+    margin: 0.5rem 0;
 }
 
 .form-actions {
