@@ -104,10 +104,19 @@ header {
 }
 
 .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 800;
   font-size: 1.5rem;
   color: var(--primary-color);
   padding-left: 1.5rem;
+}
+
+.logo img {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
 }
 
 .nav-links {
